@@ -3112,7 +3112,8 @@ body {
   position: relative;
 }
 
-.filler-page-wrapper {
+.filler-page-wrapper,
+.filler-page-card {
   position: relative;
   display: inline-block;
   background: #ffffff;
@@ -3237,20 +3238,22 @@ body {
 /* The actual text input area */
 .filler-text-input {
   display: inline-block;
-  min-width: 40px;
-  border: 1px dashed rgba(99, 102, 241, 0.45);
-  background: rgba(255, 255, 255, 0.7);
+  min-width: 64px;
+  min-height: 26px;
+  border: 1.5px dashed rgba(99, 102, 241, 0.45);
+  background: rgba(255, 255, 255, 0.85);
   color: #000000;
   font-family: Helvetica, Arial, sans-serif;
   font-weight: 500;
-  padding: 2px 5px;
+  padding: 3px 6px;
   outline: none;
-  line-height: 1.15;
+  line-height: 1.2;
   border-radius: 4px;
   cursor: text;
   word-break: break-word;
   white-space: pre-wrap;
-  transition: background 150ms ease, border-color 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+  box-sizing: border-box;
 }
 
 .filler-text-item.active .filler-text-input,
@@ -3260,11 +3263,6 @@ body {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
 }
 
-.filler-text-input:empty::before {
-  content: attr(data-placeholder);
-  color: rgba(0, 0, 0, 0.35);
-  pointer-events: none;
-}
 
 /* ==========================================================================
    PDF FILLER: SIGNATURE FEATURE & MODAL
@@ -3308,7 +3306,7 @@ body {
   z-index: 22;
   transform: translate(0, 0);
   touch-action: none;
-  cursor: move;
+  cursor: grab;
   border: 1.5px dashed rgba(245, 158, 11, 0.45);
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.1);
@@ -3318,11 +3316,31 @@ body {
   user-select: none;
 }
 
+.filler-signature-item:hover {
+  cursor: grab;
+  border-color: rgba(245, 158, 11, 0.7);
+  background: rgba(255, 255, 255, 0.18);
+}
+
 .filler-signature-item.active {
   z-index: 32;
   border-color: #f59e0b;
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25), 0 8px 24px rgba(0, 0, 0, 0.4);
   background: rgba(255, 255, 255, 0.25);
+  cursor: grab;
+}
+
+.filler-signature-item.is-dragging {
+  cursor: grabbing !important;
+  opacity: 0.92;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55), 0 0 0 3px rgba(245, 158, 11, 0.5);
+  z-index: 50;
+}
+
+.filler-text-item.is-dragging {
+  cursor: grabbing !important;
+  opacity: 0.92;
+  z-index: 50;
 }
 
 .filler-sig-img {
@@ -3330,6 +3348,8 @@ body {
   width: 100%;
   height: auto;
   pointer-events: none;
+  -webkit-user-drag: none;
+  user-select: none;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }
 

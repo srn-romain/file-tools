@@ -50,6 +50,7 @@ const sigColorBtns = document.querySelectorAll('.sig-color-btn');
 // State
 let currentPdfFile = null;
 let currentPdfBuffer = null;
+let currentPdfBytes = null;
 let defaultFontSize = 14; // pixels
 let loadedPages = [];     // Array of { pageIndex, pageNum, canvas, overlay }
 let textItemCounter = 1;
@@ -164,10 +165,20 @@ function setupInputs() {
     }
   });
 
-  // Global click to deselect text fields or signature items
+  // Global click to deselect text fields or clean up empty ones
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.filler-text-item') && !e.target.closest('.filler-signature-item') && !e.target.closest('.filler-size-selector')) {
-      document.querySelectorAll('.filler-text-item.active, .filler-signature-item.active').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.filler-text-item').forEach(el => {
+        const inp = el.querySelector('.filler-text-input');
+        const age = Date.now() - (parseInt(el.dataset.createdAt, 10) || 0);
+        if (age > 400 && inp && !inp.innerText.trim()) {
+          el.remove();
+          if (activeItemEl === el) activeItemEl = null;
+        } else {
+          el.classList.remove('active');
+        }
+      });
+      document.querySelectorAll('.filler-signature-item.active').forEach(el => el.classList.remove('active'));
       activeItemEl = null;
     }
   });
@@ -224,10 +235,12 @@ async function handlePdfFile(file) {
     currentPdfFile = file;
     showToast(`Lecture de ${file.name}...`);
 
-    const arrayBuffer = await file.arrayBuffer();
-    currentPdfBuffer = arrayBuffer;
+    const rawBuffer = await file.arrayBuffer();
+    // Keep an intact Uint8Array copy so PDF.js Web Worker never detaches it
+    currentPdfBytes = new Uint8Array(rawBuffer);
+    currentPdfBuffer = currentPdfBytes.buffer;
 
-    await renderPdfPages(arrayBuffer);
+    await renderPdfPages(currentPdfBytes.slice());
 
     fillerStep1.hidden = true;
     fillerStep2.hidden = false;
@@ -241,12 +254,13 @@ async function handlePdfFile(file) {
 /**
  * Render all pages of the PDF on canvas with clickable overlays
  */
-async function renderPdfPages(arrayBuffer) {
+async function renderPdfPages(pdfData) {
   fillerPagesViewport.innerHTML = '';
   loadedPages = [];
   lastActivePageIndex = 0;
 
-  const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+  const dataCopy = pdfData instanceof Uint8Array ? pdfData.slice() : new Uint8Array(pdfData);
+  const pdf = await pdfjs.getDocument({ data: dataCopy }).promise;
   const numPages = pdf.numPages;
 
   for (let pNum = 1; pNum <= numPages; pNum++) {
@@ -254,7 +268,7 @@ async function renderPdfPages(arrayBuffer) {
     const viewport = page.getViewport({ scale: 1.5 }); // High-DPI display scale
 
     const wrapper = document.createElement('div');
-    wrapper.className = 'filler-page-card';
+    wrapper.className = 'filler-page-card filler-page-wrapper';
     wrapper.dataset.pageIndex = pNum - 1;
 
     // Header label
@@ -287,6 +301,17 @@ async function renderPdfPages(arrayBuffer) {
 
       // Only trigger if clicked on the overlay itself, not inside an existing item
       if (e.target !== overlay) return;
+      e.stopPropagation();
+
+      // Clean up previous text fields that were left empty
+      document.querySelectorAll('.filler-text-item').forEach(el => {
+        const inp = el.querySelector('.filler-text-input');
+        const age = Date.now() - (parseInt(el.dataset.createdAt, 10) || 0);
+        if (age > 400 && inp && !inp.innerText.trim()) {
+          el.remove();
+          if (activeItemEl === el) activeItemEl = null;
+        }
+      });
 
       const rect = overlay.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
@@ -320,6 +345,7 @@ function createTextField(pageIndex, overlay, x, y, initialText = '', fontSize = 
   itemEl.id = itemId;
   itemEl.dataset.pageIndex = pageIndex;
   itemEl.dataset.fontSize = fontSize;
+  itemEl.dataset.createdAt = Date.now().toString();
   itemEl.style.left = `${Math.max(4, Math.round(x))}px`;
   itemEl.style.top = `${Math.max(4, Math.round(y))}px`;
 
@@ -364,12 +390,16 @@ function createTextField(pageIndex, overlay, x, y, initialText = '', fontSize = 
   const input = document.createElement('div');
   input.className = 'filler-text-input';
   input.contentEditable = 'true';
-  input.setAttribute('data-placeholder', 'Tapez votre texte...');
   input.style.fontSize = `${fontSize}px`;
   input.textContent = initialText;
 
   itemEl.appendChild(bar);
   itemEl.appendChild(input);
+
+  // Prevent button clicks from unfocusing input
+  btnDec.addEventListener('mousedown', (e) => e.preventDefault());
+  btnInc.addEventListener('mousedown', (e) => e.preventDefault());
+  btnDel.addEventListener('mousedown', (e) => e.preventDefault());
 
   // Activate on click
   itemEl.addEventListener('click', (e) => {
@@ -378,6 +408,9 @@ function createTextField(pageIndex, overlay, x, y, initialText = '', fontSize = 
     itemEl.classList.add('active');
     activeItemEl = itemEl;
     lastActivePageIndex = pageIndex;
+    if (e.target !== input && !e.target.closest('.filler-item-bar')) {
+      input.focus();
+    }
   });
 
   // Size Controls
@@ -405,6 +438,31 @@ function createTextField(pageIndex, overlay, x, y, initialText = '', fontSize = 
     if (activeItemEl === itemEl) activeItemEl = null;
   });
 
+  // If left empty on blur or click away, remove automatically after grace period
+  input.addEventListener('blur', () => {
+    setTimeout(() => {
+      if (!itemEl.isConnected) return;
+      if (itemEl.contains(document.activeElement)) return;
+      const age = Date.now() - (parseInt(itemEl.dataset.createdAt, 10) || 0);
+      if (age > 500 && !input.innerText.trim()) {
+        itemEl.remove();
+        if (activeItemEl === itemEl) activeItemEl = null;
+      }
+    }, 200);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (!input.innerText.trim()) {
+        itemEl.remove();
+        if (activeItemEl === itemEl) activeItemEl = null;
+      } else {
+        itemEl.classList.remove('active');
+        input.blur();
+      }
+    }
+  });
+
   // Smooth Dragging
   setupItemDragging(itemEl, dragHandle, overlay);
 
@@ -414,7 +472,7 @@ function createTextField(pageIndex, overlay, x, y, initialText = '', fontSize = 
   setTimeout(() => {
     input.focus();
     activeItemEl = itemEl;
-  }, 10);
+  }, 20);
 }
 
 /**
@@ -517,8 +575,8 @@ function createSignatureItem(pageIndex, overlay, x, y, dataUrl, includeMeta = tr
     lastActivePageIndex = pageIndex;
   });
 
-  // Smooth Dragging
-  setupItemDragging(itemEl, dragHandle, overlay);
+  // Smooth Dragging from ANYWHERE on the signature item (image, caption, handle, bar)
+  setupSignatureDragging(itemEl, overlay);
 
   overlay.appendChild(itemEl);
   activeItemEl = itemEl;
@@ -526,7 +584,86 @@ function createSignatureItem(pageIndex, overlay, x, y, dataUrl, includeMeta = tr
 }
 
 /**
- * Handle mouse / touch dragging of boxes across overlay
+ * Handle mouse / touch / pen dragging for signature items
+ * Allows dragging from ANYWHERE on the signature card (image, caption, handle, bar)
+ */
+function setupSignatureDragging(itemEl, overlay) {
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let initialLeft = 0;
+  let initialTop = 0;
+
+  itemEl.addEventListener('pointerdown', (e) => {
+    // Left-click only (or touch/pen)
+    if (e.button !== 0 && e.button !== undefined) return;
+    // Don't drag if clicking mini toolbar buttons (+, -, delete)
+    if (e.target.closest('.filler-btn-micro')) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    initialLeft = parseInt(itemEl.style.left, 10) || 0;
+    initialTop = parseInt(itemEl.style.top, 10) || 0;
+
+    itemEl.classList.add('is-dragging');
+    document.querySelectorAll('.filler-text-item.active, .filler-signature-item.active').forEach(el => el.classList.remove('active'));
+    itemEl.classList.add('active');
+    activeItemEl = itemEl;
+    if (itemEl.dataset.pageIndex !== undefined) {
+      lastActivePageIndex = parseInt(itemEl.dataset.pageIndex, 10) || 0;
+    }
+
+    try {
+      itemEl.setPointerCapture(e.pointerId);
+    } catch (err) {}
+
+    const onPointerMove = (moveEvent) => {
+      if (!isDragging) return;
+      moveEvent.preventDefault();
+
+      const dx = moveEvent.clientX - startX;
+      const dy = moveEvent.clientY - startY;
+
+      const itemW = itemEl.offsetWidth || 170;
+      const itemH = itemEl.offsetHeight || 60;
+      const maxLeft = Math.max(0, overlay.clientWidth - itemW);
+      const maxTop = Math.max(0, overlay.clientHeight - itemH);
+
+      const newLeft = Math.max(0, Math.min(maxLeft, initialLeft + dx));
+      const newTop = Math.max(0, Math.min(maxTop, initialTop + dy));
+
+      itemEl.style.left = `${Math.round(newLeft)}px`;
+      itemEl.style.top = `${Math.round(newTop)}px`;
+    };
+
+    const onPointerUp = (upEvent) => {
+      if (!isDragging) return;
+      isDragging = false;
+      itemEl.classList.remove('is-dragging');
+
+      try {
+        if (itemEl.hasPointerCapture(upEvent.pointerId)) {
+          itemEl.releasePointerCapture(upEvent.pointerId);
+        }
+      } catch (err) {}
+
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+  });
+}
+
+/**
+ * Handle mouse / touch / pen dragging of text boxes across overlay
  */
 function setupItemDragging(itemEl, handleEl, overlay) {
   let isDragging = false;
@@ -535,41 +672,75 @@ function setupItemDragging(itemEl, handleEl, overlay) {
   let initialLeft = 0;
   let initialTop = 0;
 
-  handleEl.addEventListener('mousedown', (e) => {
+  const barEl = itemEl.querySelector('.filler-item-bar');
+
+  const startDrag = (e) => {
+    if (e.button !== 0 && e.button !== undefined) return;
+    if (e.target.closest('.filler-btn-micro')) return;
+
     e.preventDefault();
     e.stopPropagation();
-    isDragging = true;
 
+    isDragging = true;
     startX = e.clientX;
     startY = e.clientY;
     initialLeft = parseInt(itemEl.style.left, 10) || 0;
     initialTop = parseInt(itemEl.style.top, 10) || 0;
 
+    itemEl.classList.add('is-dragging');
     document.querySelectorAll('.filler-text-item.active, .filler-signature-item.active').forEach(el => el.classList.remove('active'));
     itemEl.classList.add('active');
     activeItemEl = itemEl;
 
-    const onMouseMove = (moveEvent) => {
+    const dragTarget = e.currentTarget;
+    try {
+      dragTarget.setPointerCapture(e.pointerId);
+    } catch (err) {}
+
+    const onPointerMove = (moveEvent) => {
       if (!isDragging) return;
+      moveEvent.preventDefault();
+
       const dx = moveEvent.clientX - startX;
       const dy = moveEvent.clientY - startY;
 
-      const newLeft = Math.max(0, Math.min(overlay.clientWidth - 40, initialLeft + dx));
-      const newTop = Math.max(0, Math.min(overlay.clientHeight - 20, initialTop + dy));
+      const itemW = itemEl.offsetWidth || 60;
+      const itemH = itemEl.offsetHeight || 30;
+      const maxLeft = Math.max(0, overlay.clientWidth - itemW);
+      const maxTop = Math.max(0, overlay.clientHeight - itemH);
+
+      const newLeft = Math.max(0, Math.min(maxLeft, initialLeft + dx));
+      const newTop = Math.max(0, Math.min(maxTop, initialTop + dy));
 
       itemEl.style.left = `${Math.round(newLeft)}px`;
       itemEl.style.top = `${Math.round(newTop)}px`;
     };
 
-    const onMouseUp = () => {
+    const onPointerUp = (upEvent) => {
+      if (!isDragging) return;
       isDragging = false;
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      itemEl.classList.remove('is-dragging');
+
+      try {
+        if (dragTarget.hasPointerCapture(upEvent.pointerId)) {
+          dragTarget.releasePointerCapture(upEvent.pointerId);
+        }
+      } catch (err) {}
+
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
     };
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  });
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+  };
+
+  handleEl.addEventListener('pointerdown', startDrag);
+  if (barEl) {
+    barEl.addEventListener('pointerdown', startDrag);
+  }
 }
 
 /* ==========================================================================
@@ -997,8 +1168,9 @@ function setupDownload() {
       if (!PDFLib) throw new Error('PDF-Lib non chargé');
       const { PDFDocument, StandardFonts, rgb } = PDFLib;
 
-      // Load PDF Document
-      const pdfDoc = await PDFDocument.load(currentPdfBuffer.slice(0));
+      // Load PDF Document safely from Uint8Array slice
+      const pdfBytesToLoad = currentPdfBytes ? currentPdfBytes.slice() : new Uint8Array(currentPdfBuffer).slice();
+      const pdfDoc = await PDFDocument.load(pdfBytesToLoad);
       const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
       let textCount = 0;
@@ -1134,6 +1306,7 @@ function setupDownload() {
 function resetFiller() {
   currentPdfFile = null;
   currentPdfBuffer = null;
+  currentPdfBytes = null;
   loadedPages = [];
   lastActivePageIndex = 0;
   fillerPagesViewport.innerHTML = '';
