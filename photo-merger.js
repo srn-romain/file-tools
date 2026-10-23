@@ -3,7 +3,7 @@
  * 100% Client-Side multi-photo arrangement & canvas rendering
  */
 
-import { showToast, initHeaderDropdown } from './shared.js';
+import { showToast, initSharedUI } from './shared.js?v=2';
 
 const pmState = {
   photos: [], // Array of { id, file, name, img, width, height, aspect, url }
@@ -687,6 +687,6 @@ window.addEventListener('paste', (e) => {
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
-  initHeaderDropdown();
+  initSharedUI('photo-merger');
   initPhotoMerger();
 });

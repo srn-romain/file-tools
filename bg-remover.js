@@ -4,7 +4,7 @@
  */
 
 import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.8/+esm';
-import { showToast, initHeaderDropdown } from './shared.js';
+import { showToast, initSharedUI } from './shared.js?v=2';
 
 // DOM Elements: Step 1
 const step1 = document.getElementById('step-1');
@@ -731,6 +731,6 @@ window.addEventListener('paste', (e) => {
 
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
-  initHeaderDropdown();
+  initSharedUI('bg-remover');
   initBgRemover();
 });

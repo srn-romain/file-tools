@@ -21,79 +21,8 @@
   <div class="bg-grid"></div>
 
   <div class="app-container">
-    <!-- Header with Interactive Tool Dropdown -->
-    <header class="app-header">
-      <div class="brand-dropdown-container">
-        <!-- Dropdown Selector Button -->
-        <button type="button" id="tool-dropdown-btn" class="tool-dropdown-btn" aria-haspopup="true" aria-expanded="false" title="Changer d'outil">
-          <div class="tool-btn-icon" id="header-tool-icon">🖼️</div>
-          <div class="tool-btn-info">
-            <span class="tool-btn-name" id="header-tool-name">Assembleur & Fusion Photo</span>
-            <span class="tool-btn-sub">Outils locaux &bull; Changer d'outil</span>
-          </div>
-          <svg class="chevron-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m6 9 6 6 6-6"/>
-          </svg>
-        </button>
-
-        <!-- Dropdown Menu -->
-        <div id="tool-dropdown-menu" class="tool-dropdown-menu" role="menu" hidden>
-          <div class="dropdown-header">Sélectionnez un outil :</div>
-          
-          <!-- Item 1: ClearCut (Background Remover) -->
-          <a href="index.html" class="tool-dropdown-item" role="menuitem">
-            <div class="item-icon bg-remover-icon">✂️</div>
-            <div class="item-content">
-              <div class="item-title-row">
-                <span class="item-title">Détourage d'image (ClearCut)</span>
-              </div>
-              <p class="item-desc">Supprimez et retouchez l'arrière-plan de vos photos avec précision.</p>
-            </div>
-          </a>
-
-          <!-- Item 2: PDF Organizer -->
-          <a href="pdf-organizer.html" class="tool-dropdown-item" role="menuitem">
-            <div class="item-icon pdf-organizer-icon">📑</div>
-            <div class="item-content">
-              <div class="item-title-row">
-                <span class="item-title">Organisateur de PDF</span>
-              </div>
-              <p class="item-desc">Réorganisez, déplacez, pivotez et supprimez des pages de vos PDF.</p>
-            </div>
-          </a>
-
-          <!-- Item 3: File Compressor -->
-          <a href="compressor.html" class="tool-dropdown-item" role="menuitem">
-            <div class="item-icon compressor-icon">🗜️</div>
-            <div class="item-content">
-              <div class="item-title-row">
-                <span class="item-title">Compresseur de fichiers</span>
-              </div>
-              <p class="item-desc">Réduisez le poids de vos images et documents PDF sans perte visible.</p>
-            </div>
-          </a>
-
-          <!-- Item 4: Photo Merger / Assembler -->
-          <a href="photo-merger.html" class="tool-dropdown-item active" role="menuitem">
-            <div class="item-icon photo-merger-icon">🖼️</div>
-            <div class="item-content">
-              <div class="item-title-row">
-                <span class="item-title">Assembleur & Fusion Photo</span>
-              </div>
-              <p class="item-desc">Combinez jusqu'à 100 photos en une seule image (grille, côte à côte, empilées).</p>
-            </div>
-            <div class="item-check">✓</div>
-          </a>
-        </div>
-      </div>
-
-      <div class="header-badges">
-        <div class="privacy-pill">
-          <span class="status-dot"></span>
-          <span>100% In-Browser &bull; Sans Serveur &bull; Privé</span>
-        </div>
-      </div>
-    </header>
+    <!-- Header with Dynamic Tool Dropdown -->
+    <header id="app-header" class="app-header"></header>
 
     <!-- ==========================================================================
          PHOTO MERGER & ASSEMBLER TOOL VIEW
@@ -414,18 +343,8 @@
       </section>
     </div>
 
-    <!-- Main Footer -->
-    <footer class="app-footer">
-      <div class="footer-content">
-        <p>OmniTools &bull; Suite d'outils 100% Client-Side conçus pour <strong>GitHub Pages</strong> &bull; Sans backend</p>
-        <div class="footer-links">
-          <span class="badge-tech">ISNet FP32 AI</span>
-          <span class="badge-tech">PDF-Lib & PDF.js</span>
-          <span class="badge-tech">0 Serveur / 100% Privé</span>
-          <span class="badge-tech">GitHub Pages Ready</span>
-        </div>
-      </div>
-    </footer>
+    <!-- Shared Footer -->
+    <footer id="app-footer" class="app-footer"></footer>
   </div>
 
   <!-- Notification Toast -->

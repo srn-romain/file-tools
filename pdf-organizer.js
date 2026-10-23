@@ -3,7 +3,7 @@
  * 100% Client-Side with PDF-Lib & PDF.js
  */
 
-import { showToast, initHeaderDropdown } from './shared.js';
+import { showToast, initSharedUI } from './shared.js?v=2';
 
 // Configure PDF.js Worker
 const pdfjs = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
@@ -591,6 +591,6 @@ window.addEventListener('paste', (e) => {
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
-  initHeaderDropdown();
+  initSharedUI('pdf-organizer');
   initPdfOrganizer();
 });

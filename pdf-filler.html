@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remplir un PDF — Formulaire & Texte Direct (OmniTools)</title>
+  <meta name="description" content="Remplissez vos formulaires et documents PDF directement dans votre navigateur sans avoir à les imprimer. Ajoutez du texte, ajustez la taille et téléchargez votre PDF complété en 1 clic. 100% privé, sans serveur.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='7' height='7' x='3' y='3' rx='1'/><rect width='7' height='7' x='14' y='3' rx='1'/><rect width='7' height='7' x='14' y='14' rx='1'/><rect width='7' height='7' x='3' y='14' rx='1'/></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- PDF Libraries (Client-side only) -->
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow effects -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-grid"></div>
+
+  <div class="app-container">
+    <!-- Header with Dynamic Tool Dropdown -->
+    <header id="app-header" class="app-header"></header>
+
+    <!-- ==========================================================================
+         PDF FILLER TOOL VIEW
+         ========================================================================== -->
+    <div id="tool-view-pdf-filler" class="tool-view active">
+      <!-- Title Section -->
+      <div class="hero-header">
+        <h1 class="main-title">Remplissez vos <span class="gradient-text">PDF et formulaires</span> en ligne</h1>
+        <p class="subtitle">Cliquez directement sur votre document pour insérer du texte, ajustez la taille et téléchargez votre PDF complété sans avoir à l'imprimer.</p>
+      </div>
+
+      <!-- STEP 1: IMPORT SECTION -->
+      <section id="filler-step-1" class="step-card active" aria-label="Étape 1 : Importer un formulaire PDF">
+        <div class="step-indicator">
+          <span class="step-num">Étape 1</span>
+          <span class="step-label">Glissez ou sélectionnez le document PDF à remplir</span>
+        </div>
+
+        <div id="filler-dropzone" class="dropzone" tabindex="0" role="button" aria-label="Zone de dépôt du PDF">
+          <input type="file" id="filler-file-input" accept="application/pdf" hidden>
+          
+          <div class="dropzone-content">
+            <div class="dropzone-icon-wrapper" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(234, 88, 12, 0.2)); border: 1px solid rgba(245, 158, 11, 0.35);">
+              <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M12 18h6"/>
+                <path d="M12 14h6"/>
+                <path d="M8 18h.01"/>
+                <path d="M8 14h.01"/>
+              </svg>
+            </div>
+
+            <h2 class="dropzone-title">Glissez-déposez votre formulaire PDF ici</h2>
+            <p class="dropzone-desc">Cerfa, contrats, factures, déclarations ou tout document à compléter</p>
+
+            <div class="dropzone-actions">
+              <button type="button" id="filler-browse-btn" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/>
+                  <line x1="9" y1="15" x2="15" y2="15"/>
+                </svg>
+                Parcourir vos PDF locaux
+              </button>
+
+              <span class="divider-text">ou collez directement avec</span>
+
+              <div class="paste-badge" title="Copiez un fichier PDF et collez avec Ctrl+V">
+                <kbd class="kbd-key">Ctrl</kbd> + <kbd class="kbd-key">V</kbd>
+                <span class="paste-badge-text">Coller un PDF</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dropzone-overlay">
+            <div class="overlay-content">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M12 18h6"/>
+              </svg>
+              <span>Relâchez pour ouvrir le formulaire !</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample PDF action bar -->
+        <div class="sample-image-bar">
+          <span class="sample-label">Tester tout de suite ?</span>
+          <button type="button" id="filler-sample-btn" class="btn-sample">
+            <span class="pdf-pill-icon">📄</span>
+            <span>Tester avec un document d'exemple</span>
+          </button>
+        </div>
+
+        <!-- Features list -->
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon">✍️</div>
+            <div>
+              <h3>Saisie Directe</h3>
+              <p>Cliquez à l'endroit voulu et tapez votre texte directement sur le document.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🔍</div>
+            <div>
+              <h3>Taille Réglable</h3>
+              <p>Ajustez facilement la taille du texte pour l'adapter parfaitement aux cases.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🛡️</div>
+            <div>
+              <h3>100% Hors-Ligne</h3>
+              <p>Vos documents et données saisies restent confidentiels sur votre ordinateur.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 2: FORM FILLING STUDIO -->
+      <section id="filler-step-2" class="step-card filler-studio-card" aria-label="Étape 2 : Remplir et enregistrer" hidden>
+        <!-- Top Toolbar -->
+        <div class="filler-top-bar">
+          <div class="filler-controls-left">
+            <div class="filler-hint-badge">
+              <span>💡 Cliquez sur le document pour ajouter du texte</span>
+            </div>
+
+            <!-- Size Selector -->
+            <div class="filler-size-selector" title="Taille par défaut pour les nouveaux textes">
+              <span class="filler-size-label">Taille :</span>
+              <button type="button" id="filler-size-dec" class="btn-size-step" title="Diminuer la taille">-</button>
+              <span id="filler-size-display" class="filler-size-display">14 px</span>
+              <button type="button" id="filler-size-inc" class="btn-size-step" title="Augmenter la taille">+</button>
+            </div>
+          </div>
+
+          <div class="filler-actions-right">
+            <button type="button" id="filler-new-btn" class="btn btn-ghost" title="Changer de fichier PDF">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+              <span>Autre PDF</span>
+            </button>
+
+            <button type="button" id="filler-download-btn" class="btn btn-save" title="Enregistrer et télécharger le PDF complété">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Télécharger le PDF rempli</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Pages Viewport -->
+        <div id="filler-pages-viewport" class="filler-pages-viewport">
+          <!-- Dynamically populated with pages and overlays -->
+        </div>
+      </section>
+    </div>
+
+    <!-- Shared Footer -->
+    <footer id="app-footer" class="app-footer"></footer>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Dedicated PDF Filler Script -->
+  <script type="module" src="pdf-filler.js"></script>
+</body>
+</html>

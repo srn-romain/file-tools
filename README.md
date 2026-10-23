@@ -14,9 +14,20 @@ Chaque outil dispose de sa **propre page HTML et de son propre fichier JS dédi�
 | 📑 **Organisateur de PDF** | [pdf-organizer.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/pdf-organizer.html) | [pdf-organizer.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/pdf-organizer.js) | Réorganisation des pages, rotation 90°, exclusion de pages et fusion de plusieurs PDF. |
 | 🗜️ **Compresseur de fichiers** | [compressor.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/compressor.html) | [compressor.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/compressor.js) | Réduction de taille (JPG, PNG, WebP et PDF) jusqu'à -80% sans perte visible. |
 | 🖼️ **Assembleur Photo** | [photo-merger.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/photo-merger.html) | [photo-merger.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/photo-merger.js) | Fusion jusqu'à 100 photos en 1 image (grille sur-mesure, côte à côte, vertical). |
+| ✍️ **Remplir un PDF** | [pdf-filler.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/pdf-filler.html) | [pdf-filler.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/pdf-filler.js) | Remplissage simple de formulaires : saisie de texte directe, taille réglable (A-/A+), déplacement et export PDF. |
 
 - **Styles communs** : [style.css](file:///c:/Users/Sieur/WebstormProjects/remove-background/style.css) (design sombre ultra-moderne, glassmorphism, responsive).
 - **Utilitaires partagés** : [shared.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/shared.js) (menu déroulant d'en-tête, notifications toast, sécurité drag & drop).
+
+---
+
+## ✍️ Outil : Remplir un PDF (Formulaires & Texte)
+
+Remplissez vos documents PDF, Cerfa, contrats ou factures directement dans votre navigateur sans avoir à les imprimer :
+- **Saisie directe au clic** : Cliquez à l'endroit désiré sur le document pour créer un champ de texte.
+- **Taille de police ajustable** : Boutons instantanés `A-` / `A+` pour adapter le texte aux cases du formulaire.
+- **Déplacement fluide** : Poignée de glisser-déplacer pour caler parfaitement le texte sur les pointillés ou les lignes.
+- **Enregistrement vectoriel propre** : Le texte est gravé directement dans le document PDF via `pdf-lib` sans altérer la qualité originale.
 
 ---
 
