@@ -49,6 +49,45 @@ export const TOOLS = [
     iconClass: 'pdf-filler-icon',
     url: 'pdf-filler.html',
     desc: "Saisissez du texte directement sur vos documents PDF sans avoir à les imprimer."
+  },
+
+  // Category Title (Non-cliquable)
+  {
+    type: 'group-title',
+    id: 'group-transform',
+    title: 'Transform'
+  },
+
+  // Sub-items (avec alinéa / indentation)
+  {
+    id: 'pdf-to-word',
+    name: "PDF vers Word",
+    fullName: "PDF vers Word (.docx)",
+    icon: '📝',
+    iconClass: 'convert-pdf-word-icon',
+    url: 'converter.html?mode=pdf-to-word',
+    desc: "Transformez vos fichiers PDF en documents Word modifiables (.docx).",
+    isSubItem: true
+  },
+  {
+    id: 'word-to-pdf',
+    name: "Word vers PDF",
+    fullName: "Word vers PDF (.pdf)",
+    icon: '📄',
+    iconClass: 'convert-word-pdf-icon',
+    url: 'converter.html?mode=word-to-pdf',
+    desc: "Convertissez vos documents Word (.docx) en fichiers PDF standard.",
+    isSubItem: true
+  },
+  {
+    id: 'converter',
+    name: "Convertisseur Universel",
+    fullName: "Convertisseur Multi-Formats",
+    icon: '🔄',
+    iconClass: 'converter-icon',
+    url: 'converter.html',
+    desc: "Transformez vos fichiers selon l'extension voulue (PDF, Word, PNG, JPG).",
+    isSubItem: true
   }
 ];
 
@@ -71,11 +110,18 @@ export function showToast(message, duration = 3400) {
  * Prevents duplicating 70+ lines of dropdown HTML across every page.
  */
 export function initHeader(currentToolId) {
-  // Auto-detect tool ID from page filename if not provided
+  // Auto-detect tool ID from page filename and query params if not provided
   if (!currentToolId) {
     const path = window.location.pathname.toLowerCase();
-    const match = TOOLS.find(t => path.endsWith(t.url.toLowerCase()));
-    currentToolId = match ? match.id : 'bg-remover';
+    const search = window.location.search.toLowerCase();
+    if (path.endsWith('converter.html')) {
+      if (search.includes('mode=word-to-pdf')) currentToolId = 'word-to-pdf';
+      else if (search.includes('mode=pdf-to-word')) currentToolId = 'pdf-to-word';
+      else currentToolId = 'converter';
+    } else {
+      const match = TOOLS.find(t => t.url && path.endsWith(t.url.toLowerCase()));
+      currentToolId = match ? match.id : 'bg-remover';
+    }
   }
 
   const currentTool = TOOLS.find(t => t.id === currentToolId) || TOOLS[0];
@@ -100,9 +146,16 @@ export function initHeader(currentToolId) {
       <div id="tool-dropdown-menu" class="tool-dropdown-menu" role="menu" hidden>
         <div class="dropdown-header">Sélectionnez un outil :</div>
         ${TOOLS.map(tool => {
+          if (tool.type === 'group-title') {
+            return `
+              <div class="tool-dropdown-group-title" role="presentation">
+                <span>${tool.title}</span>
+              </div>
+            `;
+          }
           const isActive = tool.id === currentTool.id;
           return `
-            <a href="${tool.url}" class="tool-dropdown-item ${isActive ? 'active' : ''}" role="menuitem">
+            <a href="${tool.url}" class="tool-dropdown-item ${tool.isSubItem ? 'sub-item' : ''} ${isActive ? 'active' : ''}" role="menuitem">
               <div class="item-icon ${tool.iconClass}">${tool.icon}</div>
               <div class="item-content">
                 <div class="item-title-row">

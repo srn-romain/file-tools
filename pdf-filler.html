@@ -146,6 +146,12 @@
               <span id="filler-size-display" class="filler-size-display">14 px</span>
               <button type="button" id="filler-size-inc" class="btn-size-step" title="Augmenter la taille">+</button>
             </div>
+
+            <!-- Signature Button -->
+            <button type="button" id="filler-signature-btn" class="btn-signature-action" title="Apposer ou gérer vos signatures manuscrites">
+              <span class="btn-sig-icon">✍️</span>
+              <span class="btn-sig-text">Signature</span>
+            </button>
           </div>
 
           <div class="filler-actions-right">
@@ -176,6 +182,86 @@
 
     <!-- Shared Footer -->
     <footer id="app-footer" class="app-footer"></footer>
+  </div>
+
+  <!-- Interactive Signature Modal -->
+  <div id="sig-modal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="sig-modal-title">
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <span class="modal-icon">✍️</span>
+          <div>
+            <h3 id="sig-modal-title" class="modal-title">Apposer une signature</h3>
+            <p class="modal-subtitle">Dessinez votre signature manuscrite ou réutilisez une signature enregistrée</p>
+          </div>
+        </div>
+        <button type="button" id="sig-modal-close-btn" class="modal-close-btn" title="Fermer la fenêtre">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Saved signatures section -->
+        <div id="sig-saved-section" class="sig-saved-section" hidden>
+          <div class="sig-section-header">
+            <span class="sig-section-label">Signatures enregistrées :</span>
+            <button type="button" id="sig-create-new-btn" class="sig-btn-mini-add">
+              <span>+ Nouvelle signature</span>
+            </button>
+          </div>
+          <div id="sig-saved-list" class="sig-saved-list">
+            <!-- Dynamically populated with saved signatures -->
+          </div>
+          <div class="sig-section-divider">
+            <span>ou modifier / dessiner ci-dessous</span>
+          </div>
+        </div>
+
+        <!-- Drawing Canvas Area -->
+        <div class="sig-draw-section">
+          <div class="sig-draw-header">
+            <span class="sig-pad-label" id="sig-draw-heading">Zone de dessin :</span>
+            <div class="sig-colors-wrapper">
+              <span class="sig-color-label">Couleur :</span>
+              <button type="button" class="sig-color-btn active" data-color="#0f172a" style="background: #0f172a;" title="Encre Noire"></button>
+              <button type="button" class="sig-color-btn" data-color="#1e40af" style="background: #1e40af;" title="Encre Bleue"></button>
+            </div>
+          </div>
+
+          <div class="sig-canvas-container">
+            <canvas id="sig-canvas" width="600" height="200"></canvas>
+            <div class="sig-guide-line">
+              <span class="sig-guide-x">&times;</span>
+              <div class="sig-guide-dots"></div>
+            </div>
+            <button type="button" id="sig-clear-btn" class="sig-clear-btn" title="Effacer et recommencer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span>Effacer</span>
+            </button>
+          </div>
+
+          <!-- Metadata Option Checkbox -->
+          <div class="sig-options-box">
+            <label class="sig-checkbox-label">
+              <input type="checkbox" id="sig-meta-checkbox" checked>
+              <span class="sig-checkbox-custom"></span>
+              <span class="sig-checkbox-text">
+                <span class="sig-meta-title">Ajouter la mention électronique horodatée</span>
+                <span id="sig-meta-preview" class="sig-meta-preview">Signé électroniquement le ...</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="sig-cancel-btn" class="btn btn-ghost">Annuler</button>
+        <button type="button" id="sig-insert-btn" class="btn btn-save" title="Insérer cette signature sur le document PDF">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span id="sig-insert-btn-text">Insérer sur le document</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Notification Toast -->

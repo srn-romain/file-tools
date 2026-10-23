@@ -49,6 +49,10 @@
   padding: 0;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-dark);
@@ -275,9 +279,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   background: rgba(255, 255, 255, 0.05);
   flex-shrink: 0;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .bg-remover-icon {
@@ -347,6 +353,62 @@ body {
 
 .tool-dropdown-item.active .item-check {
   opacity: 1;
+}
+
+/* Category Title Item (Non-clickable, matching established dropdown design) */
+.tool-dropdown-group-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 12px 12px 4px;
+  margin-top: 6px;
+  border-top: 1px solid var(--border-subtle);
+  pointer-events: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+}
+
+/* Sub-items with Clean Alinéa */
+.tool-dropdown-item.sub-item {
+  margin-left: 14px;
+  padding-left: 14px;
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0 12px 12px 0;
+  transition: all var(--transition-fast);
+}
+
+.tool-dropdown-item.sub-item:hover {
+  border-left-color: var(--primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tool-dropdown-item.sub-item.active {
+  border-left-color: var(--primary);
+  background: rgba(99, 102, 241, 0.14);
+}
+
+/* Specific conversion icon styles */
+.convert-pdf-word-icon {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(99, 102, 241, 0.25));
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.convert-word-pdf-icon {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(249, 115, 22, 0.25));
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.converter-icon {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(59, 130, 246, 0.25));
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.converter-icon {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(59, 130, 246, 0.25));
+  border: 1px solid rgba(168, 85, 247, 0.35);
 }
 
 .dropdown-divider {
@@ -3203,4 +3265,860 @@ body {
   color: rgba(0, 0, 0, 0.35);
   pointer-events: none;
 }
+
+/* ==========================================================================
+   PDF FILLER: SIGNATURE FEATURE & MODAL
+   ========================================================================== */
+
+/* Signature Action Button in Toolbar */
+.btn-signature-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(234, 88, 12, 0.18));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  padding: 6px 14px;
+  border-radius: 9px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+.btn-signature-action:hover {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.28), rgba(234, 88, 12, 0.28));
+  border-color: #f59e0b;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.28);
+}
+
+.btn-signature-action .btn-sig-icon {
+  font-size: 1rem;
+}
+
+/* Signature Floating Item on Document */
+.filler-signature-item {
+  position: absolute;
+  display: inline-flex;
+  flex-direction: column;
+  z-index: 22;
+  transform: translate(0, 0);
+  touch-action: none;
+  cursor: move;
+  border: 1.5px dashed rgba(245, 158, 11, 0.45);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px;
+  box-sizing: border-box;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  user-select: none;
+}
+
+.filler-signature-item.active {
+  z-index: 32;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25), 0 8px 24px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.filler-sig-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.filler-sig-caption {
+  font-size: 0.64rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.85);
+  border-top: 1px dashed rgba(15, 23, 42, 0.2);
+  padding: 2px 4px;
+  margin-top: 2px;
+  border-radius: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+  text-align: center;
+}
+
+/* Mini toolbar on signature item */
+.filler-sig-bar {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  background: #0f172a;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 8px 8px 0 0;
+  padding: 2px 6px;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  user-select: none;
+  z-index: 40;
+}
+
+.filler-signature-item:hover .filler-sig-bar,
+.filler-signature-item.active .filler-sig-bar {
+  display: flex;
+}
+
+/* Modal Backdrop & Card */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 18, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 180ms ease-out;
+}
+
+.modal-backdrop[hidden] {
+  display: none !important;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 640px;
+  background: #0d1322;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: modalPop 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.modal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.modal-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 2px 0 0;
+}
+
+.modal-close-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1;
+}
+
+.modal-close-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
+.modal-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Saved Signatures List */
+.sig-saved-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.sig-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.sig-section-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+
+.sig-btn-mini-add {
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sig-btn-mini-add:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.sig-saved-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.sig-card {
+  background: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+
+.sig-card:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.sig-card-preview {
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border-radius: 6px;
+  overflow: hidden;
+  padding: 4px;
+}
+
+.sig-card-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.sig-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.sig-card-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.sig-card-btn {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 120ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sig-card-btn-use {
+  background: #f59e0b;
+  color: #0f172a;
+}
+
+.sig-card-btn-use:hover {
+  background: #d97706;
+  color: #fff;
+}
+
+.sig-card-btn-edit {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.sig-card-btn-edit:hover {
+  background: #cbd5e1;
+}
+
+.sig-card-btn-del {
+  background: #fee2e2;
+  color: #dc2626;
+  width: 24px;
+  flex: 0 0 24px;
+}
+
+.sig-card-btn-del:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.sig-section-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.75rem;
+  margin: 12px 0 4px;
+}
+
+.sig-section-divider::before,
+.sig-section-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.sig-section-divider span {
+  padding: 0 10px;
+}
+
+/* Drawing Area */
+.sig-draw-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sig-draw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sig-pad-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.sig-colors-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sig-color-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.sig-color-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sig-color-btn.active {
+  border-color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.sig-canvas-container {
+  position: relative;
+  background: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08);
+  touch-action: none;
+}
+
+#sig-canvas {
+  display: block;
+  width: 100%;
+  height: 180px;
+  cursor: crosshair;
+}
+
+.sig-guide-line {
+  position: absolute;
+  bottom: 35px;
+  left: 25px;
+  right: 25px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+.sig-guide-x {
+  font-size: 1.2rem;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.sig-guide-dots {
+  flex: 1;
+  border-bottom: 1.5px dashed #64748b;
+}
+
+.sig-clear-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  color: #475569;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sig-clear-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+
+/* Options Box */
+.sig-options-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.sig-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sig-checkbox-label input[type="checkbox"] {
+  display: none;
+}
+
+.sig-checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.sig-checkbox-label input[type="checkbox"]:checked + .sig-checkbox-custom {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.sig-checkbox-label input[type="checkbox"]:checked + .sig-checkbox-custom::after {
+  content: '✓';
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.sig-checkbox-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sig-meta-title {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.sig-meta-preview {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ==========================================================================
+   CONVERTER & TRANSFORM TOOL STYLES
+   ========================================================================== */
+
+/* Mode Selector Tabs */
+.converter-mode-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.mode-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mode-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.mode-tab-btn.active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.2));
+  border-color: #10b981;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+}
+
+.mode-tab-icon {
+  font-size: 1rem;
+}
+
+.mode-tab-ext {
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  font-weight: 700;
+}
+
+.mode-tab-btn.active .mode-tab-ext {
+  background: #10b981;
+  color: #0f172a;
+}
+
+/* Target Extension Picker */
+.target-ext-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.target-picker-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.target-ext-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-ext-choice {
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-ext-choice:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.btn-ext-choice.active {
+  background: #10b981;
+  border-color: #10b981;
+  color: #0f172a;
+}
+
+/* Step 2: Converter Processing & Results */
+.converter-studio-card {
+  padding: 24px;
+}
+
+.converter-processing-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.converter-spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid rgba(16, 185, 129, 0.2);
+  border-top-color: #10b981;
+  animation: spin 800ms linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.converter-process-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 6px;
+}
+
+.converter-process-detail {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.converter-result-box {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.converter-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.conversion-flow-visual {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.from-badge {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+}
+
+.conversion-arrow {
+  color: #10b981;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.to-badge {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.2));
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.converter-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.converter-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stat-val.status-ok {
+  color: #34d399;
+  font-weight: 700;
+}
+
+.converter-preview-container {
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.preview-title {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.preview-hint {
+  font-size: 0.74rem;
+  color: #64748b;
+}
+
+.converter-preview-viewport {
+  padding: 24px;
+  max-height: 480px;
+  overflow-y: auto;
+  color: #1e293b;
+  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  line-height: 1.6;
+  background: #ffffff;
+}
+
+.converter-preview-viewport h1,
+.converter-preview-viewport h2,
+.converter-preview-viewport h3 {
+  color: #0f172a;
+  margin-top: 14px;
+  margin-bottom: 8px;
+}
+
+.converter-preview-viewport p {
+  margin: 6px 0;
+  color: #334155;
+}
+
+.preview-page-break {
+  border: 0;
+  border-top: 1.5px dashed #cbd5e1;
+  margin: 24px 0 12px;
+}
+
+.preview-page-badge {
+  display: inline-block;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.mammoth-preview {
+  color: #1e293b;
+}
+
+
 

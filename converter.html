@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transform — Convertisseur de fichiers PDF & Word (OmniTools)</title>
+  <meta name="description" content="Convertissez vos documents PDF en Word (.docx), vos fichiers Word en PDF, ou transformez vos images et fichiers vers d'autres extensions directement dans votre navigateur. 100% privé, sans serveur.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'/><polyline points='3.27 6.96 12 12.01 20.73 6.96'/><line x1='12' y1='22.08' x2='12' y2='12'/></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- PDF & Document Libraries (Client-side only) -->
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow effects -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-grid"></div>
+
+  <div class="app-container">
+    <!-- Header with Dynamic Tool Dropdown -->
+    <header id="app-header" class="app-header"></header>
+
+    <!-- ==========================================================================
+         CONVERTER / TRANSFORM TOOL VIEW
+         ========================================================================== -->
+    <div id="tool-view-converter" class="tool-view active">
+      <!-- Title Section -->
+      <div class="hero-header">
+        <h1 class="main-title">Transformez vos <span class="gradient-text">fichiers et documents</span></h1>
+        <p class="subtitle" id="converter-hero-subtitle">Convertissez instantanément vos PDF en Word (.docx), vos documents Word en PDF, ou transformez vos fichiers vers une autre extension directement dans votre navigateur.</p>
+      </div>
+
+      <!-- Mode Selector Tabs -->
+      <div class="converter-mode-selector" role="tablist" aria-label="Modes de conversion">
+        <button type="button" class="mode-tab-btn active" data-mode="pdf-to-word" role="tab" aria-selected="true">
+          <span class="mode-tab-icon">📝</span>
+          <span class="mode-tab-title">PDF vers Word</span>
+          <span class="mode-tab-ext">.docx</span>
+        </button>
+
+        <button type="button" class="mode-tab-btn" data-mode="word-to-pdf" role="tab" aria-selected="false">
+          <span class="mode-tab-icon">📄</span>
+          <span class="mode-tab-title">Word vers PDF</span>
+          <span class="mode-tab-ext">.pdf</span>
+        </button>
+
+        <button type="button" class="mode-tab-btn" data-mode="img-to-pdf" role="tab" aria-selected="false">
+          <span class="mode-tab-icon">📑</span>
+          <span class="mode-tab-title">Images vers PDF</span>
+          <span class="mode-tab-ext">.pdf</span>
+        </button>
+
+        <button type="button" class="mode-tab-btn" data-mode="pdf-to-img" role="tab" aria-selected="false">
+          <span class="mode-tab-icon">🖼️</span>
+          <span class="mode-tab-title">PDF vers Image</span>
+          <span class="mode-tab-ext">.png</span>
+        </button>
+
+        <button type="button" class="mode-tab-btn" data-mode="img-convert" role="tab" aria-selected="false">
+          <span class="mode-tab-icon">🔄</span>
+          <span class="mode-tab-title">Image vers Autre</span>
+          <span class="mode-tab-ext">JPG/PNG/WebP</span>
+        </button>
+      </div>
+
+      <!-- STEP 1: IMPORT & SELECTION -->
+      <section id="converter-step-1" class="step-card active" aria-label="Étape 1 : Importer un fichier à transformer">
+        <div class="step-indicator">
+          <span class="step-num" id="converter-step-num">Étape 1</span>
+          <span class="step-label" id="converter-dropzone-instruction">Glissez ou sélectionnez votre document PDF à convertir en Word (.docx)</span>
+        </div>
+
+        <!-- Target Extension Controls (for generic/image mode) -->
+        <div id="target-ext-picker" class="target-ext-picker" hidden>
+          <span class="target-picker-label">Extension cible souhaitée :</span>
+          <div class="target-ext-buttons" id="target-ext-buttons">
+            <!-- Dynamically populated or toggled -->
+          </div>
+        </div>
+
+        <div id="converter-dropzone" class="dropzone" tabindex="0" role="button" aria-label="Zone de dépôt du fichier">
+          <input type="file" id="converter-file-input" accept=".pdf" hidden>
+          
+          <div class="dropzone-content">
+            <div class="dropzone-icon-wrapper" id="converter-dropzone-icon-wrap" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.2)); border: 1px solid rgba(16, 185, 129, 0.35);">
+              <span id="converter-drop-icon" style="font-size: 2.2rem;">📝</span>
+            </div>
+
+            <div class="dropzone-text">
+              <h2 class="dropzone-title" id="converter-dropzone-title">Glissez-déposez votre fichier PDF ici</h2>
+              <p class="dropzone-subtitle" id="converter-dropzone-sub">Documents PDF avec texte, tableaux ou formulaires</p>
+            </div>
+
+            <div class="dropzone-actions">
+              <button type="button" id="converter-browse-btn" class="btn btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <span>Parcourir vos fichiers locaux</span>
+              </button>
+
+              <span class="action-divider">ou collez directement avec</span>
+              <kbd class="key-combo"><span class="key">Ctrl</span> + <span class="key">V</span> Coller</kbd>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample File Testing Section -->
+        <div class="sample-section">
+          <span class="sample-label">Tester tout de suite sans fichier ?</span>
+          <button type="button" id="converter-sample-btn" class="sample-btn" title="Tester la conversion avec un document d'exemple">
+            <span class="sample-icon">🧪</span>
+            <span id="converter-sample-text">Tester avec un document d'exemple</span>
+          </button>
+        </div>
+
+        <!-- Feature Highlights -->
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon">⚡</div>
+            <div>
+              <h3>Conversion Instantanée</h3>
+              <p>Extraction et transformation directe sans temps d'attente ni file de traitement.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🎯</div>
+            <div>
+              <h3>Respect des Formats</h3>
+              <p>Génération propre conforme aux normes Microsoft Word (.docx) et Adobe PDF (.pdf).</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🛡️</div>
+            <div>
+              <h3>100% Hors-Ligne & Privé</h3>
+              <p>Vos fichiers ne quittent jamais votre machine. Zéro envoi vers un serveur externe.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 2: CONVERTED RESULT & DOWNLOAD -->
+      <section id="converter-step-2" class="step-card converter-studio-card" aria-label="Étape 2 : Résultat et téléchargement" hidden>
+        <!-- Processing State Indicator -->
+        <div id="converter-processing-box" class="converter-processing-box">
+          <div class="converter-spinner"></div>
+          <h3 id="converter-processing-title" class="converter-process-title">Transformation en cours...</h3>
+          <p id="converter-processing-detail" class="converter-process-detail">Lecture et reconstruction du document...</p>
+        </div>
+
+        <!-- Result Box (shown when complete) -->
+        <div id="converter-result-box" class="converter-result-box" hidden>
+          <div class="converter-result-header">
+            <div class="conversion-flow-visual">
+              <div class="file-badge-pill from-badge" id="res-from-pill">
+                <span id="res-from-icon">📄</span>
+                <span id="res-from-name">document.pdf</span>
+              </div>
+              <span class="conversion-arrow">➔</span>
+              <div class="file-badge-pill to-badge" id="res-to-pill">
+                <span id="res-to-icon">📝</span>
+                <span id="res-to-name">document.docx</span>
+              </div>
+            </div>
+
+            <div class="converter-actions-right">
+              <button type="button" id="converter-new-btn" class="btn btn-ghost" title="Convertir un autre fichier">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+                <span>Autre fichier</span>
+              </button>
+
+              <button type="button" id="converter-download-btn" class="btn btn-save" title="Télécharger le document transformé">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <span id="converter-download-text">Télécharger le fichier Word (.docx)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Conversion Statistics -->
+          <div class="converter-stats-row" id="converter-stats-row">
+            <div class="stat-pill">
+              <span class="stat-label">Statut :</span>
+              <span class="stat-val status-ok">Converti avec succès ✓</span>
+            </div>
+            <div class="stat-pill" id="stat-pill-pages">
+              <span class="stat-label">Pages / Éléments :</span>
+              <span class="stat-val" id="stat-val-elements">3 pages</span>
+            </div>
+            <div class="stat-pill" id="stat-pill-size">
+              <span class="stat-label">Poids :</span>
+              <span class="stat-val" id="stat-val-size">145 Ko</span>
+            </div>
+          </div>
+
+          <!-- Document Preview Box -->
+          <div class="converter-preview-container">
+            <div class="preview-header">
+              <span class="preview-title">Aperçu du contenu transformé :</span>
+              <span class="preview-hint">Rendu extrait directement dans votre navigateur</span>
+            </div>
+            <div id="converter-preview-viewport" class="converter-preview-viewport">
+              <!-- Dynamically populated preview -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Shared Footer -->
+    <footer id="app-footer" class="app-footer"></footer>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Dedicated Converter Script -->
+  <script type="module" src="converter.js"></script>
+</body>
+</html>
