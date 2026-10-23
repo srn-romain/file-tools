@@ -427,6 +427,7 @@ body {
 .privacy-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   font-size: 0.8rem;
   font-weight: 500;
@@ -436,6 +437,7 @@ body {
   padding: 6px 14px;
   border-radius: 9999px;
   backdrop-filter: blur(10px);
+  white-space: nowrap;
 }
 
 .status-dot {
@@ -517,6 +519,8 @@ body {
   background: linear-gradient(135deg, var(--primary), var(--accent-purple));
   padding: 4px 10px;
   border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .step-num-2 {
@@ -787,14 +791,16 @@ body {
   to { transform: translateY(4px); }
 }
 
-/* Sample Bar */
+/* Sample Bar & Testing Section */
+.sample-section,
 .sample-image-bar {
-  margin-top: 18px;
+  margin-top: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   flex-wrap: wrap;
+  text-align: center;
 }
 
 .sample-label {
@@ -802,27 +808,32 @@ body {
   color: var(--text-muted);
 }
 
+.sample-btn,
 .btn-sample {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.03);
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  padding: 6px 14px 6px 8px;
+  padding: 8px 18px;
   border-radius: 9999px;
   font-family: var(--font-sans);
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
+  backdrop-filter: blur(8px);
 }
 
+.sample-btn:hover,
 .btn-sample:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: #10b981;
   color: #fff;
   transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
 }
 
 .sample-thumbnail {
@@ -2260,12 +2271,13 @@ body {
   }
   .app-header {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     gap: 12px;
   }
 
   .brand-dropdown-container {
     width: 100%;
+    max-width: 440px;
   }
 
   .tool-dropdown-btn {
@@ -2275,6 +2287,38 @@ body {
 
   .tool-dropdown-menu {
     width: 100%;
+  }
+
+  .header-badges {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .privacy-pill {
+    font-size: 0.76rem;
+    padding: 5px 14px;
+    white-space: nowrap;
+  }
+
+  .step-indicator {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .step-num {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .step-label {
+    text-align: center;
+    font-size: 0.88rem;
+    line-height: 1.45;
   }
 
   .pdf-pages-grid {
@@ -2314,16 +2358,55 @@ body {
   }
 
   .dropzone {
-    padding: 32px 16px;
+    padding: 26px 14px;
+    border-radius: 16px;
+  }
+
+  .dropzone-title {
+    font-size: 1.15rem;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  .dropzone-subtitle {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    text-align: center;
   }
 
   .dropzone-actions {
     flex-direction: column;
+    align-items: center;
     width: 100%;
+    gap: 10px;
   }
 
   .dropzone-actions .btn-primary {
     width: 100%;
+    max-width: 320px;
+    justify-content: center;
+  }
+
+  .action-divider,
+  .key-combo {
+    display: none !important;
+  }
+
+  .sample-section,
+  .sample-image-bar {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .sample-btn,
+  .btn-sample {
+    width: auto;
+    max-width: 100%;
+    font-size: 0.82rem;
+    padding: 7px 16px;
   }
 
   .action-buttons-row {
@@ -3853,109 +3936,261 @@ body {
    CONVERTER & TRANSFORM TOOL STYLES
    ========================================================================== */
 
-/* Mode Selector Tabs */
-.converter-mode-selector {
+/* Conversion Flow Card (Source & Target Dropdowns) */
+.converter-flow-card {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 760px;
+  margin: 0 auto 28px;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, rgba(18, 24, 38, 0.92), rgba(26, 35, 54, 0.88));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
 }
 
-.mode-tab-btn {
+.flow-selector-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flow-label {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  letter-spacing: 0.3px;
+  user-select: none;
+}
+
+.flow-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.source-dot {
+  background-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.target-dot {
+  background-color: #10b981;
+  color: #10b981;
+}
+
+.flow-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.flow-select-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 1.25rem;
+  pointer-events: none;
+  z-index: 2;
+  transition: transform var(--transition-bounce);
+}
+
+.flow-select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: rgba(15, 23, 42, 0.85);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary);
+  padding: 12px 38px 12px 46px;
   font-family: var(--font-sans);
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   font-weight: 600;
+  color: #f8fafc;
   cursor: pointer;
   transition: all var(--transition-fast);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.mode-tab-btn:hover {
-  background: rgba(255, 255, 255, 0.09);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
+.flow-select:hover {
+  border-color: rgba(16, 185, 129, 0.45);
+  background-color: rgba(15, 23, 42, 0.95);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 12px rgba(16, 185, 129, 0.15);
 }
 
-.mode-tab-btn.active {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.2));
+.flow-select:focus {
+  outline: none;
   border-color: #10b981;
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(16, 185, 129, 0.25);
 }
 
-.mode-tab-icon {
-  font-size: 1rem;
+.flow-select option {
+  background-color: #0f172a;
+  color: #f8fafc;
+  padding: 10px 14px;
+  font-size: 0.95rem;
 }
 
-.mode-tab-ext {
-  font-size: 0.72rem;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #cbd5e1;
-  font-weight: 700;
-}
-
-.mode-tab-btn.active .mode-tab-ext {
-  background: #10b981;
-  color: #0f172a;
-}
-
-/* Target Extension Picker */
-.target-ext-picker {
+.btn-swap-flow {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 18px;
-  background: rgba(255, 255, 255, 0.03);
-  padding: 10px 16px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.target-picker-label {
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: #cbd5e1;
-}
-
-.target-ext-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.btn-ext-choice {
-  padding: 5px 12px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #94a3b8;
-  font-size: 0.8rem;
-  font-weight: 600;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  color: #10b981;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  margin-top: 24px;
+  flex-shrink: 0;
+  transition: all var(--transition-bounce);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.btn-ext-choice:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-}
-
-.btn-ext-choice.active {
-  background: #10b981;
+.btn-swap-flow:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.2));
   border-color: #10b981;
-  color: #0f172a;
+  color: #34d399;
+  transform: rotate(180deg) scale(1.08);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.3);
+}
+
+.btn-swap-flow:active {
+  transform: rotate(180deg) scale(0.95);
+}
+
+@media (max-width: 640px) {
+  .converter-flow-card {
+    flex-direction: column;
+    padding: 16px 14px;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .flow-selector-group {
+    width: 100%;
+    align-items: center;
+  }
+
+  .flow-label {
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+    font-size: 0.82rem;
+  }
+
+  .flow-select-wrapper {
+    width: 100%;
+  }
+
+  .btn-swap-flow {
+    margin: 4px auto;
+    align-self: center;
+    transform: rotate(90deg);
+  }
+
+  .btn-swap-flow:hover {
+    transform: rotate(270deg) scale(1.08);
+  }
+
+  .converter-studio-card {
+    padding: 18px 14px;
+  }
+
+  .converter-result-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+  }
+
+  .conversion-flow-visual {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 6px;
+  }
+
+  .conversion-flow-visual .conversion-arrow {
+    transform: rotate(90deg);
+    font-size: 1.1rem;
+    line-height: 1;
+    display: inline-block;
+  }
+
+  .file-badge-pill {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .converter-actions-right {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .converter-actions-right .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .converter-stats-row {
+    justify-content: center;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .stat-pill {
+    font-size: 0.78rem;
+    padding: 4px 10px;
+  }
+
+  .converter-preview-viewport {
+    padding: 14px;
+    max-height: 360px;
+  }
+}
+
+@media (max-width: 420px) {
+  .main-title {
+    font-size: 1.65rem;
+  }
+
+  .subtitle {
+    font-size: 0.84rem;
+  }
+
+  .privacy-pill {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    gap: 6px;
+  }
+
+  .step-label {
+    font-size: 0.82rem;
+  }
+
+  .flow-select {
+    font-size: 0.88rem;
+    padding: 10px 32px 10px 42px;
+  }
 }
 
 /* Step 2: Converter Processing & Results */

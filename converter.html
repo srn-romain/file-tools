@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transform — Convertisseur de fichiers PDF & Word (OmniTools)</title>
-  <meta name="description" content="Convertissez vos documents PDF en Word (.docx), vos fichiers Word en PDF, ou transformez vos images et fichiers vers d'autres extensions directement dans votre navigateur. 100% privé, sans serveur.">
+  <title>Conversion de fichiers — PDF, Word, Images (OmniTools)</title>
+  <meta name="description" content="Convertissez vos documents et images dans l'extension souhaitée : PDF vers Word (.docx), Word vers PDF, JPG, PNG, WebP directement dans votre navigateur. 100% privé, sans serveur.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'/><polyline points='3.27 6.96 12 12.01 20.73 6.96'/><line x1='12' y1='22.08' x2='12' y2='12'/></svg>">
   
   <!-- Google Fonts -->
@@ -36,41 +36,43 @@
     <div id="tool-view-converter" class="tool-view active">
       <!-- Title Section -->
       <div class="hero-header">
-        <h1 class="main-title">Transformez vos <span class="gradient-text">fichiers et documents</span></h1>
-        <p class="subtitle" id="converter-hero-subtitle">Convertissez instantanément vos PDF en Word (.docx), vos documents Word en PDF, ou transformez vos fichiers vers une autre extension directement dans votre navigateur.</p>
+        <h1 class="main-title">Conversion de <span class="gradient-text">fichiers</span></h1>
+        <p class="subtitle" id="converter-hero-subtitle">Sélectionnez la conversion souhaitée puis déposez votre fichier pour le transformer dans l'extension voulue (PDF, Word, JPG, PNG, WebP...).</p>
       </div>
 
-      <!-- Mode Selector Tabs -->
-      <div class="converter-mode-selector" role="tablist" aria-label="Modes de conversion">
-        <button type="button" class="mode-tab-btn active" data-mode="pdf-to-word" role="tab" aria-selected="true">
-          <span class="mode-tab-icon">📝</span>
-          <span class="mode-tab-title">PDF vers Word</span>
-          <span class="mode-tab-ext">.docx</span>
+      <!-- Flow Card: Source & Target Dropdowns -->
+      <div class="converter-flow-card" aria-label="Sélection des formats source et cible">
+        <div class="flow-selector-group">
+          <label for="source-format-select" class="flow-label">
+            <span class="flow-dot source-dot"></span>
+            <span>Fichier source :</span>
+          </label>
+          <div class="flow-select-wrapper">
+            <span class="flow-select-icon" id="source-format-icon">📄</span>
+            <select id="source-format-select" class="flow-select" aria-label="Extension du fichier source">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+        </div>
+
+        <button type="button" id="btn-swap-formats" class="btn-swap-flow" title="Inverser les formats (raccourci)" aria-label="Inverser la conversion">
+          <svg class="swap-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 7h12m0 0l-4-4m4 4l-4 4m-4 6H4m0 0l4 4m-4-4l4-4"/>
+          </svg>
         </button>
 
-        <button type="button" class="mode-tab-btn" data-mode="word-to-pdf" role="tab" aria-selected="false">
-          <span class="mode-tab-icon">📄</span>
-          <span class="mode-tab-title">Word vers PDF</span>
-          <span class="mode-tab-ext">.pdf</span>
-        </button>
-
-        <button type="button" class="mode-tab-btn" data-mode="img-to-pdf" role="tab" aria-selected="false">
-          <span class="mode-tab-icon">📑</span>
-          <span class="mode-tab-title">Images vers PDF</span>
-          <span class="mode-tab-ext">.pdf</span>
-        </button>
-
-        <button type="button" class="mode-tab-btn" data-mode="pdf-to-img" role="tab" aria-selected="false">
-          <span class="mode-tab-icon">🖼️</span>
-          <span class="mode-tab-title">PDF vers Image</span>
-          <span class="mode-tab-ext">.png</span>
-        </button>
-
-        <button type="button" class="mode-tab-btn" data-mode="img-convert" role="tab" aria-selected="false">
-          <span class="mode-tab-icon">🔄</span>
-          <span class="mode-tab-title">Image vers Autre</span>
-          <span class="mode-tab-ext">JPG/PNG/WebP</span>
-        </button>
+        <div class="flow-selector-group">
+          <label for="target-format-select" class="flow-label">
+            <span class="flow-dot target-dot"></span>
+            <span>Fichier cible :</span>
+          </label>
+          <div class="flow-select-wrapper">
+            <span class="flow-select-icon" id="target-format-icon">📝</span>
+            <select id="target-format-select" class="flow-select" aria-label="Extension du fichier cible">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+        </div>
       </div>
 
       <!-- STEP 1: IMPORT & SELECTION -->
@@ -78,14 +80,6 @@
         <div class="step-indicator">
           <span class="step-num" id="converter-step-num">Étape 1</span>
           <span class="step-label" id="converter-dropzone-instruction">Glissez ou sélectionnez votre document PDF à convertir en Word (.docx)</span>
-        </div>
-
-        <!-- Target Extension Controls (for generic/image mode) -->
-        <div id="target-ext-picker" class="target-ext-picker" hidden>
-          <span class="target-picker-label">Extension cible souhaitée :</span>
-          <div class="target-ext-buttons" id="target-ext-buttons">
-            <!-- Dynamically populated or toggled -->
-          </div>
         </div>
 
         <div id="converter-dropzone" class="dropzone" tabindex="0" role="button" aria-label="Zone de dépôt du fichier">
@@ -118,9 +112,9 @@
         </div>
 
         <!-- Sample File Testing Section -->
-        <div class="sample-section">
+        <div class="sample-section sample-image-bar">
           <span class="sample-label">Tester tout de suite sans fichier ?</span>
-          <button type="button" id="converter-sample-btn" class="sample-btn" title="Tester la conversion avec un document d'exemple">
+          <button type="button" id="converter-sample-btn" class="sample-btn btn-sample" title="Tester la conversion avec un document d'exemple">
             <span class="sample-icon">🧪</span>
             <span id="converter-sample-text">Tester avec un document d'exemple</span>
           </button>
@@ -233,6 +227,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <!-- Dedicated Converter Script -->
-  <script type="module" src="converter.js"></script>
+  <script type="module" src="converter.js?v=4"></script>
 </body>
 </html>

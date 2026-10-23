@@ -3,7 +3,7 @@
  * 100% Client-Side with PDF.js & PDF-Lib
  */
 
-import { showToast, initSharedUI } from './shared.js?v=2';
+import { showToast, initSharedUI } from './shared.js?v=3';
 
 // Configure PDF.js Worker
 const pdfjs = window.pdfjsLib || window['pdfjs-dist/build/pdf'];

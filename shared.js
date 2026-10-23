@@ -51,43 +51,14 @@ export const TOOLS = [
     desc: "Saisissez du texte directement sur vos documents PDF sans avoir à les imprimer."
   },
 
-  // Category Title (Non-cliquable)
-  {
-    type: 'group-title',
-    id: 'group-transform',
-    title: 'Transform'
-  },
-
-  // Sub-items (avec alinéa / indentation)
-  {
-    id: 'pdf-to-word',
-    name: "PDF vers Word",
-    fullName: "PDF vers Word (.docx)",
-    icon: '📝',
-    iconClass: 'convert-pdf-word-icon',
-    url: 'converter.html?mode=pdf-to-word',
-    desc: "Transformez vos fichiers PDF en documents Word modifiables (.docx).",
-    isSubItem: true
-  },
-  {
-    id: 'word-to-pdf',
-    name: "Word vers PDF",
-    fullName: "Word vers PDF (.pdf)",
-    icon: '📄',
-    iconClass: 'convert-word-pdf-icon',
-    url: 'converter.html?mode=word-to-pdf',
-    desc: "Convertissez vos documents Word (.docx) en fichiers PDF standard.",
-    isSubItem: true
-  },
   {
     id: 'converter',
-    name: "Convertisseur Universel",
-    fullName: "Convertisseur Multi-Formats",
+    name: "Conversion de fichiers",
+    fullName: "Conversion de fichiers",
     icon: '🔄',
     iconClass: 'converter-icon',
     url: 'converter.html',
-    desc: "Transformez vos fichiers selon l'extension voulue (PDF, Word, PNG, JPG).",
-    isSubItem: true
+    desc: "Convertissez vos fichiers dans le format souhaité : PDF vers Word, Word vers PDF, JPG, PNG, WebP..."
   }
 ];
 
