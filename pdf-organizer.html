@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Studio — Organiser, Réordonner & Fusionner PDF (OmniTools)</title>
+  <meta name="description" content="Organisez vos fichiers PDF gratuitement dans votre navigateur : déplacez les pages avant/après, pivotez, excluez des pages indésirables et fusionnez plusieurs PDF. 100% privé, sans serveur.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='7' height='7' x='3' y='3' rx='1'/><rect width='7' height='7' x='14' y='3' rx='1'/><rect width='7' height='7' x='14' y='14' rx='1'/><rect width='7' height='7' x='3' y='14' rx='1'/></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- PDF Libraries (Client-side only) -->
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow effects -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-grid"></div>
+
+  <div class="app-container">
+    <!-- Header with Interactive Tool Dropdown -->
+    <header class="app-header">
+      <div class="brand-dropdown-container">
+        <!-- Dropdown Selector Button -->
+        <button type="button" id="tool-dropdown-btn" class="tool-dropdown-btn" aria-haspopup="true" aria-expanded="false" title="Changer d'outil">
+          <div class="tool-btn-icon" id="header-tool-icon">📑</div>
+          <div class="tool-btn-info">
+            <span class="tool-btn-name" id="header-tool-name">Organisateur de PDF</span>
+            <span class="tool-btn-sub">Outils locaux &bull; Changer d'outil</span>
+          </div>
+          <svg class="chevron-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="tool-dropdown-menu" class="tool-dropdown-menu" role="menu" hidden>
+          <div class="dropdown-header">Sélectionnez un outil :</div>
+          
+          <!-- Item 1: ClearCut (Background Remover) -->
+          <a href="index.html" class="tool-dropdown-item" role="menuitem">
+            <div class="item-icon bg-remover-icon">✂️</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Détourage d'image (ClearCut)</span>
+              </div>
+              <p class="item-desc">Supprimez et retouchez l'arrière-plan de vos photos avec précision.</p>
+            </div>
+          </a>
+
+          <!-- Item 2: PDF Organizer -->
+          <a href="pdf-organizer.html" class="tool-dropdown-item active" role="menuitem">
+            <div class="item-icon pdf-organizer-icon">📑</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Organisateur de PDF</span>
+              </div>
+              <p class="item-desc">Réorganisez, déplacez, pivotez et supprimez des pages de vos PDF.</p>
+            </div>
+            <div class="item-check">✓</div>
+          </a>
+
+          <!-- Item 3: File Compressor -->
+          <a href="compressor.html" class="tool-dropdown-item" role="menuitem">
+            <div class="item-icon compressor-icon">🗜️</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Compresseur de fichiers</span>
+              </div>
+              <p class="item-desc">Réduisez le poids de vos images et documents PDF sans perte visible.</p>
+            </div>
+          </a>
+
+          <!-- Item 4: Photo Merger / Assembler -->
+          <a href="photo-merger.html" class="tool-dropdown-item" role="menuitem">
+            <div class="item-icon photo-merger-icon">🖼️</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Assembleur & Fusion Photo</span>
+              </div>
+              <p class="item-desc">Combinez jusqu'à 100 photos en une seule image (grille, côte à côte, empilées).</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="header-badges">
+        <div class="privacy-pill">
+          <span class="status-dot"></span>
+          <span>100% In-Browser &bull; Sans Serveur &bull; Privé</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==========================================================================
+         PDF ORGANIZER TOOL VIEW
+         ========================================================================== -->
+    <div id="tool-view-pdf-organizer" class="tool-view active">
+      <!-- Title Section -->
+      <div class="hero-header">
+        <h1 class="main-title">Organisez, réordonnez et <span class="gradient-text">fusionnez vos PDF</span></h1>
+        <p class="subtitle">Sélectionnez un ou plusieurs fichiers PDF. Réorganisez chaque page avant, après, pivotez ou décochez les pages indésirables pour télécharger votre nouveau PDF.</p>
+      </div>
+
+      <!-- PDF STEP 1: IMPORT SECTION -->
+      <section id="pdf-step-1" class="step-card active" aria-label="Étape 1 : Importer des fichiers PDF">
+        <div class="step-indicator">
+          <span class="step-num">Étape 1</span>
+          <span class="step-label">Glissez ou sélectionnez un ou plusieurs fichiers PDF</span>
+        </div>
+
+        <div id="pdf-dropzone" class="dropzone" tabindex="0" role="button" aria-label="Zone de dépôt de fichiers PDF">
+          <input type="file" id="pdf-file-input" accept="application/pdf" multiple hidden>
+          
+          <div class="dropzone-content">
+            <div class="dropzone-icon-wrapper pdf-icon-wrapper">
+              <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+            </div>
+
+            <h2 class="dropzone-title">Glissez-déposez vos fichiers PDF ici</h2>
+            <p class="dropzone-desc">Vous pouvez sélectionner un ou plusieurs PDF à la fois pour les réorganiser et les fusionner</p>
+
+            <div class="dropzone-actions">
+              <button type="button" id="pdf-browse-btn" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/>
+                  <line x1="9" y1="15" x2="15" y2="15"/>
+                </svg>
+                Parcourir vos PDF locaux
+              </button>
+
+              <span class="divider-text">ou collez directement un PDF avec</span>
+
+              <div class="paste-badge" title="Copiez un fichier PDF et collez avec Ctrl+V">
+                <kbd class="kbd-key">Ctrl</kbd> + <kbd class="kbd-key">V</kbd>
+                <span class="paste-badge-text">Coller un PDF</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dropzone-overlay">
+            <div class="overlay-content">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="12" y1="18" x2="12" y2="12"/>
+                <line x1="9" y1="15" x2="15" y2="15"/>
+              </svg>
+              <span>Relâchez pour charger vos PDF !</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample PDF action bar -->
+        <div class="sample-image-bar">
+          <span class="sample-label">Pas de PDF sous la main ?</span>
+          <button type="button" id="pdf-sample-btn" class="btn-sample">
+            <span class="pdf-pill-icon">📄</span>
+            <span>Tester avec un document d'exemple multi-pages</span>
+          </button>
+        </div>
+
+        <!-- Features list -->
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon">🔀</div>
+            <div>
+              <h3>Réorganisation Totale</h3>
+              <p>Glissez-déposez vos pages avant, après ou au milieu en toute liberté.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">☑️</div>
+            <div>
+              <h3>Sélection Flexible</h3>
+              <p>Toutes les pages sont cochées par défaut. Décochez pour exclure une page.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📑</div>
+            <div>
+              <h3>Multi-Fichiers</h3>
+              <p>Ajoutez plusieurs PDF à la suite pour les fusionner en un seul document.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PDF STEP 2: WORKSPACE & REORDERING -->
+      <section id="pdf-step-2" class="step-card" aria-label="Étape 2 : Organiser et exporter le PDF" hidden>
+        <div class="step-indicator">
+          <span class="step-num step-num-2">Étape 2</span>
+          <span class="step-label">Réorganisez vos pages, cochez/décochez et téléchargez</span>
+        </div>
+
+        <!-- Workspace Toolbar -->
+        <div class="pdf-toolbar">
+          <div class="pdf-toolbar-stats">
+            <span id="pdf-pages-count" class="stat-badge">0 page au total</span>
+            <span id="pdf-selected-count" class="stat-badge stat-badge-accent">0 sélectionnée</span>
+          </div>
+
+          <div class="pdf-toolbar-actions">
+            <button type="button" id="pdf-select-all-btn" class="btn btn-secondary btn-sm" title="Tout cocher pour le téléchargement">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Tout cocher</span>
+            </button>
+            <button type="button" id="pdf-deselect-all-btn" class="btn btn-secondary btn-sm" title="Tout décocher">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+              <span>Tout décocher</span>
+            </button>
+            <button type="button" id="pdf-add-more-btn" class="btn btn-secondary btn-sm" title="Ajouter d'autres fichiers PDF à ce document">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              <span>Ajouter d'autres PDF</span>
+            </button>
+            <input type="file" id="pdf-add-more-input" accept="application/pdf" multiple hidden>
+          </div>
+        </div>
+
+        <!-- PDF Loading Indicator -->
+        <div id="pdf-loading-indicator" class="pdf-loading-box" hidden>
+          <div class="loader-circle loader-sm"></div>
+          <span id="pdf-loading-text">Extraction des pages et rendu des miniatures...</span>
+        </div>
+
+        <!-- Grid of PDF Pages -->
+        <div id="pdf-pages-grid" class="pdf-pages-grid" aria-label="Grille des pages PDF">
+          <!-- Dynamic page cards rendered here -->
+        </div>
+
+        <!-- Export & Reset Actions Bar -->
+        <div class="result-actions pdf-export-card">
+          <div class="pdf-filename-row">
+            <label for="pdf-export-name" class="filename-label">Nom du fichier final :</label>
+            <div class="filename-input-wrapper">
+              <input type="text" id="pdf-export-name" class="filename-input" value="document-organise.pdf" placeholder="document.pdf">
+            </div>
+          </div>
+
+          <div class="action-buttons-row">
+            <button type="button" id="pdf-download-btn" class="btn btn-save" title="Télécharger le nouveau PDF avec les pages sélectionnées dans l'ordre">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span id="pdf-download-btn-text">Télécharger le PDF réorganisé</span>
+            </button>
+          </div>
+
+          <div class="reset-button-wrapper">
+            <button type="button" id="pdf-new-btn" class="btn btn-reset">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14"/>
+                <path d="M5 12h14"/>
+              </svg>
+              <span>Insérer de nouveaux PDF</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Main Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>OmniTools &bull; Suite d'outils 100% Client-Side conçus pour <strong>GitHub Pages</strong> &bull; Sans backend</p>
+        <div class="footer-links">
+          <span class="badge-tech">ISNet FP32 AI</span>
+          <span class="badge-tech">PDF-Lib & PDF.js</span>
+          <span class="badge-tech">0 Serveur / 100% Privé</span>
+          <span class="badge-tech">GitHub Pages Ready</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Dedicated PDF Organizer Script -->
+  <script type="module" src="pdf-organizer.js"></script>
+</body>
+</html>

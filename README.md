@@ -4,13 +4,19 @@ Une suite d'outils web modernes, élégants et instantanés, fonctionnant **enti
 
 ---
 
-## 🧭 Menu déroulant multi-outils
+## 🧭 Menu déroulant & Architecture multi-pages
 
-Le bouton en haut à gauche est une **liste déroulante interactive** permettant de basculer instantanément entre vos outils :
-- ✂️ **Détourage d'image (ClearCut)**
-- 📑 **Organisateur de PDF (PDF Studio)**
-- 🗜️ **Compresseur de fichiers (Images & PDF)**
-- 🖼️ **Assembleur & Fusion Photo**
+Chaque outil dispose de sa **propre page HTML et de son propre fichier JS dédié**, pour un code propre, lisible et facile à faire évoluer :
+
+| Outil | Page HTML | Fichier JS | Description |
+|---|---|---|---|
+| ✂️ **Détourage d'image** | [index.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/index.html) | [bg-remover.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/bg-remover.js) | Détourage IA (ISNet FP32), retouche manuelle (gomme / restauration), prévisualisation avant/après. |
+| 📑 **Organisateur de PDF** | [pdf-organizer.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/pdf-organizer.html) | [pdf-organizer.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/pdf-organizer.js) | Réorganisation des pages, rotation 90°, exclusion de pages et fusion de plusieurs PDF. |
+| 🗜️ **Compresseur de fichiers** | [compressor.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/compressor.html) | [compressor.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/compressor.js) | Réduction de taille (JPG, PNG, WebP et PDF) jusqu'à -80% sans perte visible. |
+| 🖼️ **Assembleur Photo** | [photo-merger.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/photo-merger.html) | [photo-merger.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/photo-merger.js) | Fusion jusqu'à 100 photos en 1 image (grille sur-mesure, côte à côte, vertical). |
+
+- **Styles communs** : [style.css](file:///c:/Users/Sieur/WebstormProjects/remove-background/style.css) (design sombre ultra-moderne, glassmorphism, responsive).
+- **Utilitaires partagés** : [shared.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/shared.js) (menu déroulant d'en-tête, notifications toast, sécurité drag & drop).
 
 ---
 

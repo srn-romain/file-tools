@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compresseur de fichiers — Images & PDF (OmniTools)</title>
+  <meta name="description" content="Compressez et réduisez la taille de vos images (JPG, PNG, WebP) et documents PDF sans perte de qualité visible. 100% privé dans votre navigateur, sans upload de fichier.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='7' height='7' x='3' y='3' rx='1'/><rect width='7' height='7' x='14' y='3' rx='1'/><rect width='7' height='7' x='14' y='14' rx='1'/><rect width='7' height='7' x='3' y='14' rx='1'/></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- PDF Libraries (Client-side PDF compression) -->
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow effects -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-grid"></div>
+
+  <div class="app-container">
+    <!-- Header with Interactive Tool Dropdown -->
+    <header class="app-header">
+      <div class="brand-dropdown-container">
+        <!-- Dropdown Selector Button -->
+        <button type="button" id="tool-dropdown-btn" class="tool-dropdown-btn" aria-haspopup="true" aria-expanded="false" title="Changer d'outil">
+          <div class="tool-btn-icon" id="header-tool-icon">🗜️</div>
+          <div class="tool-btn-info">
+            <span class="tool-btn-name" id="header-tool-name">Compresseur de fichiers</span>
+            <span class="tool-btn-sub">Outils locaux &bull; Changer d'outil</span>
+          </div>
+          <svg class="chevron-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="tool-dropdown-menu" class="tool-dropdown-menu" role="menu" hidden>
+          <div class="dropdown-header">Sélectionnez un outil :</div>
+          
+          <!-- Item 1: ClearCut (Background Remover) -->
+          <a href="index.html" class="tool-dropdown-item" role="menuitem">
+            <div class="item-icon bg-remover-icon">✂️</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Détourage d'image (ClearCut)</span>
+              </div>
+              <p class="item-desc">Supprimez et retouchez l'arrière-plan de vos photos avec précision.</p>
+            </div>
+          </a>
+
+          <!-- Item 2: PDF Organizer -->
+          <a href="pdf-organizer.html" class="tool-dropdown-item" role="menuitem">
+            <div class="item-icon pdf-organizer-icon">📑</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Organisateur de PDF</span>
+              </div>
+              <p class="item-desc">Réorganisez, déplacez, pivotez et supprimez des pages de vos PDF.</p>
+            </div>
+          </a>
+
+          <!-- Item 3: File Compressor -->
+          <a href="compressor.html" class="tool-dropdown-item active" role="menuitem">
+            <div class="item-icon compressor-icon">🗜️</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Compresseur de fichiers</span>
+              </div>
+              <p class="item-desc">Réduisez le poids de vos images et documents PDF sans perte visible.</p>
+            </div>
+            <div class="item-check">✓</div>
+          </a>
+
+          <!-- Item 4: Photo Merger / Assembler -->
+          <a href="photo-merger.html" class="tool-dropdown-item" role="menuitem">
+            <div class="item-icon photo-merger-icon">🖼️</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Assembleur & Fusion Photo</span>
+              </div>
+              <p class="item-desc">Combinez jusqu'à 100 photos en une seule image (grille, côte à côte, empilées).</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="header-badges">
+        <div class="privacy-pill">
+          <span class="status-dot"></span>
+          <span>100% In-Browser &bull; Sans Serveur &bull; Privé</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==========================================================================
+         FILE COMPRESSOR TOOL VIEW
+         ========================================================================== -->
+    <div id="tool-view-compressor" class="tool-view active">
+      <!-- Title Section -->
+      <div class="hero-header">
+        <h1 class="main-title">Compressez et réduisez la taille de vos <span class="gradient-text">fichiers</span></h1>
+        <p class="subtitle">Optimisez vos images (JPG, PNG, WebP) et documents PDF directement dans votre navigateur. Réduisez le poids de vos fichiers jusqu'à 80% sans perte visible.</p>
+      </div>
+
+      <!-- COMPRESSOR STEP 1: IMPORT SECTION -->
+      <section id="compress-step-1" class="step-card active" aria-label="Étape 1 : Importer un fichier à compresser">
+        <div class="step-indicator">
+          <span class="step-num">Étape 1</span>
+          <span class="step-label">Glissez ou sélectionnez une image ou un PDF à compresser</span>
+        </div>
+
+        <div id="compress-dropzone" class="dropzone" tabindex="0" role="button" aria-label="Zone de dépôt de fichier à compresser">
+          <input type="file" id="compress-file-input" accept="image/jpeg, image/png, image/webp, image/avif, application/pdf" hidden>
+          
+          <div class="dropzone-content">
+            <div class="dropzone-icon-wrapper compress-icon-wrapper">
+              <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+                <path d="M12 12v9"/>
+                <path d="m8 17 4-4 4 4"/>
+              </svg>
+            </div>
+
+            <h2 class="dropzone-title">Glissez-déposez votre image ou PDF ici</h2>
+            <p class="dropzone-desc">Formats supportés : JPG, PNG, WebP et PDF &bull; Jusqu'à 100 Mo</p>
+
+            <div class="dropzone-actions">
+              <button type="button" id="compress-browse-btn" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Parcourir vos fichiers
+              </button>
+
+              <span class="divider-text">ou collez directement avec</span>
+
+              <div class="paste-badge" title="Copiez une image ou un PDF et collez avec Ctrl+V">
+                <kbd class="kbd-key">Ctrl</kbd> + <kbd class="kbd-key">V</kbd>
+                <span class="paste-badge-text">Coller un fichier</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dropzone-overlay">
+            <div class="overlay-content">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 17V3m0 0L7 8m5-5 5 5"/>
+                <path d="M20 21H4"/>
+              </svg>
+              <span>Relâchez pour lancer l'optimisation !</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample buttons -->
+        <div class="sample-image-bar">
+          <span class="sample-label">Tester avec un fichier d'exemple :</span>
+          <button type="button" id="compress-sample-img-btn" class="btn-sample">
+            <img src="sample.jpg" alt="Exemple photo" class="sample-thumbnail">
+            <span>Photo HD (JPG)</span>
+          </button>
+          <button type="button" id="compress-sample-pdf-btn" class="btn-sample">
+            <span class="pdf-pill-icon">📄</span>
+            <span>Document (PDF)</span>
+          </button>
+        </div>
+
+        <!-- Features grid -->
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon">⚡</div>
+            <div>
+              <h3>Compression Instantanée</h3>
+              <p>Traitement direct par le processeur de votre appareil sans upload.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📉</div>
+            <div>
+              <h3>Jusqu'à -80% d'Espace</h3>
+              <p>Réduisez drastiquement la taille pour les emails et les envois web.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🛡️</div>
+            <div>
+              <h3>100% Confidentiel</h3>
+              <p>Vos documents et photos restent privés et ne quittent jamais votre PC.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMPRESSOR STEP 2: SETTINGS & RESULT -->
+      <section id="compress-step-2" class="step-card" aria-label="Étape 2 : Réglages et téléchargement" hidden>
+        <div class="step-indicator">
+          <span class="step-num step-num-2">Étape 2</span>
+          <span class="step-label">Ajustez la compression et téléchargez votre fichier</span>
+        </div>
+
+        <!-- Compression Summary Comparison Card -->
+        <div class="compress-summary-card">
+          <div class="compress-file-info">
+            <div class="compress-file-icon" id="compress-file-icon">🖼️</div>
+            <div class="compress-file-details">
+              <span class="compress-file-name" id="compress-filename">fichier.jpg</span>
+              <span class="compress-file-sub" id="compress-file-sub">Chargement...</span>
+            </div>
+          </div>
+
+          <div class="compress-comparison-box">
+            <div class="compress-stat">
+              <span class="stat-title">Taille originale</span>
+              <span class="stat-value orig" id="compress-orig-size">-- Mo</span>
+            </div>
+            
+            <div class="compress-arrow">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+              <span class="saving-badge" id="compress-saving-badge">-0%</span>
+            </div>
+
+            <div class="compress-stat">
+              <span class="stat-title">Taille optimisée</span>
+              <span class="stat-value final" id="compress-result-size">Calcul...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compression Control Settings -->
+        <div class="compress-controls-card">
+          <div class="compress-section-title">
+            <span>Niveau de compression</span>
+          </div>
+
+          <!-- Presets -->
+          <div class="compress-presets">
+            <button type="button" class="preset-btn" data-preset="max" title="Gain d'espace maximal, idéal pour les gros envois email">
+              <span class="preset-icon">🚀</span>
+              <div class="preset-info">
+                <span class="preset-name">Forte réduction</span>
+                <span class="preset-sub">Taille mini &bull; Qualité standard</span>
+              </div>
+            </button>
+            <button type="button" class="preset-btn active" data-preset="balanced" title="Équilibre idéal entre réduction de poids et qualité d'image">
+              <span class="preset-icon">⚖️</span>
+              <div class="preset-info">
+                <span class="preset-name">Équilibré (Recommandé)</span>
+                <span class="preset-sub">Excellente qualité visuelle</span>
+              </div>
+            </button>
+            <button type="button" class="preset-btn" data-preset="light" title="Compression très légère, conserve le maximum de netteté">
+              <span class="preset-icon">✨</span>
+              <div class="preset-info">
+                <span class="preset-name">Légère</span>
+                <span class="preset-sub">Qualité maximale &bull; Moins compressé</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- Quality Slider -->
+          <div class="compress-slider-box">
+            <div class="slider-header-row">
+              <label for="compress-quality-slider" class="slider-label">Qualité de compression :</label>
+              <span id="compress-quality-val" class="slider-val-badge">75%</span>
+            </div>
+            <input type="range" id="compress-quality-slider" min="15" max="95" value="75" class="tool-range-slider">
+          </div>
+
+          <!-- Scale selector (Image only) -->
+          <div class="compress-scale-row" id="compress-scale-row">
+            <span class="scale-label">Redimensionner l'image :</span>
+            <div class="scale-options">
+              <button type="button" class="scale-btn active" data-scale="1.0">100% (Original)</button>
+              <button type="button" class="scale-btn" data-scale="0.8">80%</button>
+              <button type="button" class="scale-btn" data-scale="0.6">60%</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Preview Stage -->
+        <div class="compress-preview-stage">
+          <div class="compress-status-indicator" id="compress-status-indicator">
+            <div class="loader-circle loader-sm"></div>
+            <span id="compress-status-text">Prêt</span>
+          </div>
+          <div class="compress-preview-canvas-wrap">
+            <img id="compress-img-preview" class="compress-preview-img" alt="Aperçu optimisé" hidden>
+            <canvas id="compress-canvas-preview" class="compress-preview-canvas" hidden></canvas>
+          </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="result-actions">
+          <div class="action-buttons-row">
+            <button type="button" id="compress-download-btn" class="btn btn-save" title="Télécharger le fichier compressé">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span id="compress-download-btn-text">Télécharger le fichier compressé</span>
+            </button>
+          </div>
+
+          <div class="reset-button-wrapper">
+            <button type="button" id="compress-new-btn" class="btn btn-reset">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14"/>
+                <path d="M5 12h14"/>
+              </svg>
+              <span>Compresser un autre fichier</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Main Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>OmniTools &bull; Suite d'outils 100% Client-Side conçus pour <strong>GitHub Pages</strong> &bull; Sans backend</p>
+        <div class="footer-links">
+          <span class="badge-tech">ISNet FP32 AI</span>
+          <span class="badge-tech">PDF-Lib & PDF.js</span>
+          <span class="badge-tech">0 Serveur / 100% Privé</span>
+          <span class="badge-tech">GitHub Pages Ready</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Dedicated Compressor Script -->
+  <script type="module" src="compressor.js"></script>
+</body>
+</html>

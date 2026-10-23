@@ -3,18 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OmniTools — Suite d'outils gratuits & 100% locaux (Détourage d'image & Organisateur PDF)</title>
-  <meta name="description" content="Suite d'outils gratuits directement dans votre navigateur : détourez vos images par IA et organisez, réordonnez, fusionnez ou supprimez des pages de vos PDF. 100% privé, sans serveur, compatible GitHub Pages.">
+  <title>ClearCut AI — Détourage d'image & Retouche (OmniTools)</title>
+  <meta name="description" content="Supprimez et retouchez l'arrière-plan de vos images par IA haute précision directement dans votre navigateur. 100% privé, sans serveur, compatible GitHub Pages.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='7' height='7' x='3' y='3' rx='1'/><rect width='7' height='7' x='14' y='3' rx='1'/><rect width='7' height='7' x='14' y='14' rx='1'/><rect width='7' height='7' x='3' y='14' rx='1'/></svg>">
   
+  <!-- Backwards compatibility hash router -->
+  <script>
+    (function() {
+      var h = window.location.hash.replace('#', '');
+      if (h === 'pdf-organizer') window.location.replace('pdf-organizer.html');
+      else if (h === 'compressor') window.location.replace('compressor.html');
+      else if (h === 'photo-merger') window.location.replace('photo-merger.html');
+    })();
+  </script>
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- PDF Libraries (Client-side only) -->
-  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   
   <link rel="stylesheet" href="style.css">
 </head>
@@ -45,7 +51,7 @@
           <div class="dropdown-header">Sélectionnez un outil :</div>
           
           <!-- Item 1: ClearCut (Background Remover) -->
-          <button type="button" class="tool-dropdown-item active" data-tool="bg-remover" role="menuitem">
+          <a href="index.html" class="tool-dropdown-item active" role="menuitem">
             <div class="item-icon bg-remover-icon">✂️</div>
             <div class="item-content">
               <div class="item-title-row">
@@ -54,10 +60,10 @@
               <p class="item-desc">Supprimez et retouchez l'arrière-plan de vos photos avec précision.</p>
             </div>
             <div class="item-check">✓</div>
-          </button>
+          </a>
 
           <!-- Item 2: PDF Organizer -->
-          <button type="button" class="tool-dropdown-item" data-tool="pdf-organizer" role="menuitem">
+          <a href="pdf-organizer.html" class="tool-dropdown-item" role="menuitem">
             <div class="item-icon pdf-organizer-icon">📑</div>
             <div class="item-content">
               <div class="item-title-row">
@@ -65,11 +71,10 @@
               </div>
               <p class="item-desc">Réorganisez, déplacez, pivotez et supprimez des pages de vos PDF.</p>
             </div>
-            <div class="item-check">✓</div>
-          </button>
+          </a>
 
           <!-- Item 3: File Compressor -->
-          <button type="button" class="tool-dropdown-item" data-tool="compressor" role="menuitem">
+          <a href="compressor.html" class="tool-dropdown-item" role="menuitem">
             <div class="item-icon compressor-icon">🗜️</div>
             <div class="item-content">
               <div class="item-title-row">
@@ -77,11 +82,10 @@
               </div>
               <p class="item-desc">Réduisez le poids de vos images et documents PDF sans perte visible.</p>
             </div>
-            <div class="item-check">✓</div>
-          </button>
+          </a>
 
           <!-- Item 4: Photo Merger / Assembler -->
-          <button type="button" class="tool-dropdown-item" data-tool="photo-merger" role="menuitem">
+          <a href="photo-merger.html" class="tool-dropdown-item" role="menuitem">
             <div class="item-icon photo-merger-icon">🖼️</div>
             <div class="item-content">
               <div class="item-title-row">
@@ -89,8 +93,7 @@
               </div>
               <p class="item-desc">Combinez jusqu'à 100 photos en une seule image (grille, côte à côte, empilées).</p>
             </div>
-            <div class="item-check">✓</div>
-          </button>
+          </a>
         </div>
       </div>
 
@@ -160,11 +163,11 @@
                 Parcourir vos images locales
               </button>
 
-              <span class="divider-text">ou appuyez sur</span>
+              <span class="divider-text">ou collez directement avec</span>
 
-              <div class="paste-badge" title="Copiez une image n'importe où et collez-la avec Ctrl+V">
+              <div class="paste-badge" title="Copiez n'importe quelle image et collez avec Ctrl+V">
                 <kbd class="kbd-key">Ctrl</kbd> + <kbd class="kbd-key">V</kbd>
-                <span class="paste-badge-text">Coller l'image</span>
+                <span class="paste-badge-text">Coller une image</span>
               </div>
             </div>
           </div>
@@ -175,228 +178,186 @@
                 <path d="M12 17V3m0 0L7 8m5-5 5 5"/>
                 <path d="M20 21H4"/>
               </svg>
-              <span>Relâchez pour lancer le détourage automatique !</span>
+              <span>Relâchez pour lancer le détourage !</span>
             </div>
           </div>
         </div>
 
-        <!-- Sample Image Trigger -->
+        <!-- Sample Image helper -->
         <div class="sample-image-bar">
           <span class="sample-label">Pas d'image sous la main ?</span>
           <button type="button" id="sample-btn" class="btn-sample">
-            <img src="sample.jpg" alt="Exemple chat" class="sample-thumbnail">
-            <span>Tester avec cette photo exemple</span>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m9 18 6-6-6-6"/>
-            </svg>
+            <img src="sample.jpg" alt="Exemple photo" class="sample-thumbnail">
+            <span>Tester avec notre photo d'exemple (chat haute définition)</span>
           </button>
         </div>
 
-        <!-- Key features list -->
+        <!-- Features list -->
         <div class="features-grid">
           <div class="feature-item">
             <div class="feature-icon">✨</div>
             <div>
               <h3>Détourage Automatique</h3>
-              <p>L'IA isole le sujet principal en haute résolution dès l'insertion.</p>
+              <p>Réseau neuronal haute définition qui détecte avec soin les silhouettes et les cheveux.</p>
             </div>
           </div>
           <div class="feature-item">
             <div class="feature-icon">✏️</div>
             <div>
-              <h3>Retouche comme Remove.bg</h3>
-              <p>Gomme et pinceau de restauration intégrés pour parfaire les zones délicates.</p>
+              <h3>Gomme & Restauration</h3>
+              <p>Outils d'ajustement intégrés pour affiner manuellement les moindres détails.</p>
             </div>
           </div>
           <div class="feature-item">
-            <div class="feature-icon">🛡️</div>
+            <div class="feature-icon">🔒</div>
             <div>
-              <h3>100% Local & GitHub Pages</h3>
-              <p>Aucun serveur. Tout est calculé dans votre navigateur en respectant votre vie privée.</p>
+              <h3>100% Local & Privé</h3>
+              <p>Vos photos ne quittent jamais votre ordinateur. Traitement direct sur votre processeur.</p>
             </div>
           </div>
         </div>
       </section>
 
       <!-- STEP 2: PROCESSING & RESULT SECTION -->
-      <section id="step-2" class="step-card" aria-label="Étape 2 : Détourage automatique et résultat" hidden>
+      <section id="step-2" class="step-card" aria-label="Étape 2 : Traitement et résultat" hidden>
         <div class="step-indicator">
           <span class="step-num step-num-2">Étape 2</span>
-          <span class="step-label" id="step-2-title">Détourage automatique & Résultat</span>
+          <span class="step-label">Détourage par IA &bull; Retouche &amp; Téléchargement</span>
         </div>
 
-        <!-- PROCESSING STATE -->
+        <!-- Progress State -->
         <div id="processing-state" class="processing-card">
-          <div class="ai-loader">
-            <div class="scanner-line"></div>
-            <div class="loader-circle"></div>
-            <div class="loader-sparkles">✨</div>
-          </div>
-
-          <h2 id="process-title" class="process-title">Détourage automatique en cours...</h2>
-          <p id="process-detail" class="process-detail">Chargement des modèles neuronaux haute précision...</p>
-
+          <div class="loader-circle"></div>
+          <h3 id="process-title" class="process-title">Détourage automatique en cours...</h3>
+          <p id="process-detail" class="process-detail">Calcul neuronal haute précision (ISNet FP32)...</p>
+          
           <div class="progress-bar-container">
             <div id="progress-bar" class="progress-bar" style="width: 15%;"></div>
           </div>
-          <div class="progress-info">
-            <span id="progress-percent">15%</span>
-            <span id="progress-stage">Calcul neuronal...</span>
+          <div class="progress-status-row">
+            <span id="progress-stage" class="progress-stage">Initialisation</span>
+            <span id="progress-percent" class="progress-percent">15%</span>
           </div>
-          <p class="process-note">💡 Le modèle neuronal s'exécute directement sur votre appareil et est mis en cache pour les prochains détourages.</p>
         </div>
 
-        <!-- RESULT STATE -->
+        <!-- Result State -->
         <div id="result-state" class="result-card" hidden>
-          <!-- Top View Mode Tabs (like remove.bg) -->
-          <div class="removebg-tabs-bar">
-            <div class="tabs-group">
-              <button type="button" id="tab-removed" class="tab-btn active">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M6 3v12"/><path d="M18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="m15 9-6 6"/>
-                </svg>
-                <span>Arrière-plan éliminé</span>
+          
+          <!-- Mode Tabs (Détourée / Originale / Comparaison) -->
+          <div class="view-tabs-container">
+            <div class="view-tabs" role="tablist">
+              <button type="button" id="tab-removed" class="tab-btn active" role="tab" aria-selected="true">
+                <span class="tab-icon">✨</span>
+                <span>Image détourée</span>
               </button>
-              <button type="button" id="tab-original" class="tab-btn">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-                  <circle cx="9" cy="9" r="2"/>
-                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-                </svg>
-                <span>Original</span>
+              <button type="button" id="tab-original" class="tab-btn" role="tab" aria-selected="false">
+                <span class="tab-icon">🖼️</span>
+                <span>Image originale</span>
               </button>
-              <button type="button" id="tab-compare" class="tab-btn">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/>
-                </svg>
-                <span>Comparaison</span>
+              <button type="button" id="tab-compare" class="tab-btn" role="tab" aria-selected="false">
+                <span class="tab-icon">↔️</span>
+                <span>Avant / Après</span>
               </button>
             </div>
 
-            <!-- Retouch Toggle Button (like remove.bg "Modifier") -->
-            <button type="button" id="toggle-editor-btn" class="btn btn-editor-toggle" title="Ajuster les contours avec la gomme et le pinceau de restauration">
+            <!-- Retouch Toggle Button -->
+            <button type="button" id="toggle-editor-btn" class="btn btn-secondary btn-sm" title="Activer les outils de retouche manuelle (Gomme & Restauration)">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                <path d="M12 20h9"/>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
               </svg>
               <span>Ajuster / Retoucher</span>
-              <span class="editor-indicator"></span>
             </button>
           </div>
 
-          <!-- RETOUCH TOOLBAR (shown when Retouch is active) -->
+          <!-- Manual Retouch Toolbar (collapsible) -->
           <div id="editor-toolbar" class="editor-toolbar" hidden>
-            <div class="editor-tools-group">
-              <span class="toolbar-section-label">Outils :</span>
-              
-              <button type="button" id="tool-erase" class="tool-btn active" title="Gomme : effacer les résidus d'arrière-plan [Touche E]">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/>
-                  <path d="M22 21H7"/>
-                  <path d="m5 11 9 9"/>
-                </svg>
-                <span>Gomme (Effacer)</span>
+            <div class="toolbar-group tools-selection">
+              <span class="toolbar-label">Outil :</span>
+              <button type="button" id="tool-erase" class="tool-btn active" title="Gomme (Raccourci : E)">
+                <span class="tool-icon">🧹</span>
+                <span>Effacer</span>
               </button>
-
-              <button type="button" id="tool-restore" class="tool-btn" title="Pinceau de restauration : récupérer des zones du sujet [Touche R]">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="m14 12-8.5 8.5a2.12 2.12 0 1 1-3-3L11 9"/>
-                  <path d="M18 10l-4-4"/>
-                  <path d="m15 4 5 5"/>
-                </svg>
-                <span>Restaurer le sujet</span>
+              <button type="button" id="tool-restore" class="tool-btn" title="Pinceau de restauration (Raccourci : R)">
+                <span class="tool-icon">🖌️</span>
+                <span>Restaurer</span>
               </button>
+            </div>
 
-              <button type="button" id="tool-undo" class="tool-btn-secondary" title="Annuler la dernière retouche [Ctrl+Z]">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="toolbar-divider"></div>
+
+            <div class="toolbar-group brush-size-group">
+              <label for="brush-size-slider" class="toolbar-label">Taille :</label>
+              <input type="range" id="brush-size-slider" min="6" max="100" value="28" class="brush-slider">
+              <span id="brush-size-value" class="brush-val-badge">28 px</span>
+              <div class="brush-preview-dot-wrapper">
+                <div id="brush-preview-dot" class="brush-preview-dot" style="width: 28px; height: 28px;"></div>
+              </div>
+            </div>
+
+            <div class="toolbar-divider"></div>
+
+            <div class="toolbar-group edge-smooth-group">
+              <label for="edge-threshold-slider" class="toolbar-label" title="Rogne ou étend les contours semi-transparents">Affiner contours :</label>
+              <input type="range" id="edge-threshold-slider" min="-20" max="20" value="0" class="edge-slider">
+              <span id="edge-threshold-value" class="brush-val-badge">0</span>
+            </div>
+
+            <div class="toolbar-divider"></div>
+
+            <div class="toolbar-group history-tools">
+              <button type="button" id="tool-undo" class="tool-btn btn-undo" title="Annuler la dernière retouche (Ctrl+Z)">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M3 7v6h6"/>
                   <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
                 </svg>
                 <span>Annuler</span>
               </button>
-
-              <button type="button" id="tool-reset-edits" class="tool-btn-secondary" title="Rétablir le détourage IA original">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                  <path d="M3 3v5h5"/>
-                  <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
-                  <path d="M16 21h5v-5"/>
-                </svg>
-                <span>Réinitialiser</span>
+              <button type="button" id="tool-reset-edits" class="tool-btn btn-reset-edits" title="Réinitialiser toutes les retouches manuelles">
+                <span>RàZ</span>
               </button>
             </div>
+          </div>
 
-            <div class="brush-size-group">
-              <span class="slider-label">Taille :</span>
-              <input type="range" id="brush-size-slider" min="6" max="100" value="28" class="tool-range-slider" aria-label="Taille du pinceau">
-              <span id="brush-size-value" class="brush-size-num">28 px</span>
-              <div class="brush-preview-circle" id="brush-preview-dot" style="width: 28px; height: 28px;"></div>
-            </div>
-
-            <div class="edge-threshold-group">
-              <span class="slider-label" title="Ajustez pour resserrer la découpe (éliminer les halos) ou pour l'adoucir">Tolérance contour :</span>
-              <input type="range" id="edge-threshold-slider" min="-30" max="30" value="0" class="tool-range-slider" aria-label="Tolérance des contours">
-              <span id="edge-threshold-value" class="brush-size-num">0</span>
+          <!-- Background theme picker for preview -->
+          <div class="bg-picker-bar">
+            <span class="bg-picker-label">Fond de prévisualisation :</span>
+            <div class="bg-options">
+              <button type="button" class="bg-btn active" data-bg="checker" title="Damier transparent"></button>
+              <button type="button" class="bg-btn" data-bg="dark" title="Fond sombre"></button>
+              <button type="button" class="bg-btn" data-bg="white" title="Fond blanc pur"></button>
+              <button type="button" class="bg-btn" data-bg="color" title="Couleur de mise en valeur (Violet)"></button>
             </div>
           </div>
 
-          <!-- Secondary Toolbar: Background Backdrops -->
-          <div class="result-toolbar">
-            <div class="view-switchers">
-              <span class="toolbar-label">Arrière-plan :</span>
-              <div class="bg-options" role="radiogroup" aria-label="Arrière-plan de prévisualisation">
-                <button type="button" class="bg-btn active" data-bg="transparent" title="Transparence originale (Damier PNG)">
-                  <span class="bg-preview bg-preview-checker"></span>
-                  <span class="bg-btn-text">Transparent</span>
-                </button>
-                <button type="button" class="bg-btn" data-bg="white" title="Fond blanc">
-                  <span class="bg-preview bg-preview-white"></span>
-                  <span class="bg-btn-text">Blanc</span>
-                </button>
-                <button type="button" class="bg-btn" data-bg="dark" title="Fond sombre">
-                  <span class="bg-preview bg-preview-dark"></span>
-                  <span class="bg-btn-text">Noir</span>
-                </button>
-                <button type="button" class="bg-btn" data-bg="blur" title="Arrière-plan original flouté (Effet portrait bokeh comme remove.bg)">
-                  <span class="bg-preview bg-preview-blur"></span>
-                  <span class="bg-btn-text">Flou bokeh</span>
-                </button>
-                <button type="button" class="bg-btn" data-bg="gradient" title="Dégradé studio">
-                  <span class="bg-preview bg-preview-gradient"></span>
-                  <span class="bg-btn-text">Studio</span>
-                </button>
-                <button type="button" class="bg-btn" data-bg="green" title="Fond vert incrustation">
-                  <span class="bg-preview bg-preview-green"></span>
-                  <span class="bg-btn-text">Fond vert</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Image Preview / Canvas Interactive Stage -->
+          <!-- Canvas / Image Display Stage -->
           <div class="preview-stage-wrapper">
-            <div id="standard-view" class="preview-stage bg-theme-transparent">
-              <div class="canvas-container" id="canvas-container">
-                <canvas id="editor-canvas" class="editor-canvas"></canvas>
+            
+            <!-- Standard Cutout View (Interactive Canvas) -->
+            <div id="standard-view" class="preview-stage bg-theme-checker">
+              <div id="canvas-container" class="canvas-container">
+                <canvas id="editor-canvas" class="editor-canvas" aria-label="Zone de retouche de l'image"></canvas>
                 <div id="brush-cursor" class="brush-cursor" hidden></div>
               </div>
-
               <div id="retouch-hint" class="retouch-hint" hidden>
-                <span>💡 Peignez sur l'image pour gommer un résidu ou restaurer une partie du sujet</span>
+                Cliquez et glissez sur l'image pour effacer ou restaurer des zones. (Ctrl+Z pour annuler)
               </div>
             </div>
 
-            <div id="original-view" class="preview-stage bg-theme-dark" hidden>
-              <img id="original-preview-img" class="cutout-image" alt="Image originale">
+            <!-- Original Image View -->
+            <div id="original-view" class="preview-stage bg-theme-checker" hidden>
+              <img id="original-preview-img" class="result-image" alt="Image originale">
             </div>
 
-            <div id="comparison-view" class="comparison-container bg-theme-transparent" hidden>
+            <!-- Interactive Before/After Comparison Slider View -->
+            <div id="comparison-view" class="comparison-container bg-theme-checker" hidden>
               <div class="comparison-before">
-                <img id="compare-before-img" class="comparison-img" alt="Image originale">
-                <span class="comparison-tag tag-before">Original</span>
+                <img id="compare-before-img" class="compare-img" alt="Avant">
+                <span class="comparison-badge badge-before">Avant</span>
               </div>
-              <div id="comparison-after" class="comparison-after">
-                <img id="compare-after-img" class="comparison-img" alt="Sans arrière-plan">
-                <span class="comparison-tag tag-after">Sans fond</span>
+              <div id="comparison-after" class="comparison-after" style="width: 50%;">
+                <img id="compare-after-img" class="compare-img" alt="Après">
+                <span class="comparison-badge badge-after">Après</span>
               </div>
               <input type="range" id="comparison-slider" min="0" max="100" value="50" class="slider-handle-input" aria-label="Curseur de comparaison avant/après">
               <div id="comparison-divider" class="comparison-divider" style="left: 50%;">
@@ -460,724 +421,6 @@
       </section>
     </div>
 
-
-    <!-- ==========================================================================
-         TOOL 2: PDF ORGANIZER (ORGANISATEUR DE PDF)
-         ========================================================================== -->
-    <div id="tool-view-pdf-organizer" class="tool-view" hidden>
-      <!-- Title Section -->
-      <div class="hero-header">
-        <h1 class="main-title">Organisez, réordonnez et <span class="gradient-text">fusionnez vos PDF</span></h1>
-        <p class="subtitle">Sélectionnez un ou plusieurs fichiers PDF. Réorganisez chaque page avant, après, pivotez ou décochez les pages indésirables pour télécharger votre nouveau PDF.</p>
-      </div>
-
-      <!-- PDF STEP 1: IMPORT SECTION -->
-      <section id="pdf-step-1" class="step-card active" aria-label="Étape 1 : Importer des fichiers PDF">
-        <div class="step-indicator">
-          <span class="step-num">Étape 1</span>
-          <span class="step-label">Glissez ou sélectionnez un ou plusieurs fichiers PDF</span>
-        </div>
-
-        <div id="pdf-dropzone" class="dropzone" tabindex="0" role="button" aria-label="Zone de dépôt de fichiers PDF">
-          <input type="file" id="pdf-file-input" accept="application/pdf" multiple hidden>
-          
-          <div class="dropzone-content">
-            <div class="dropzone-icon-wrapper pdf-icon-wrapper">
-              <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-                <polyline points="10 9 9 9 8 9"/>
-              </svg>
-            </div>
-
-            <h2 class="dropzone-title">Glissez-déposez vos fichiers PDF ici</h2>
-            <p class="dropzone-desc">Vous pouvez sélectionner un ou plusieurs PDF à la fois pour les réorganiser et les fusionner</p>
-
-            <div class="dropzone-actions">
-              <button type="button" id="pdf-browse-btn" class="btn btn-primary">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                </svg>
-                Parcourir vos fichiers PDF
-              </button>
-
-              <span class="divider-text">ou collez directement avec</span>
-
-              <div class="paste-badge" title="Copiez un fichier PDF et collez-le avec Ctrl+V">
-                <kbd class="kbd-key">Ctrl</kbd> + <kbd class="kbd-key">V</kbd>
-                <span class="paste-badge-text">Coller un PDF</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="dropzone-overlay">
-            <div class="overlay-content">
-              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 17V3m0 0L7 8m5-5 5 5"/>
-                <path d="M20 21H4"/>
-              </svg>
-              <span>Relâchez pour charger vos pages PDF !</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sample PDF Trigger -->
-        <div class="sample-image-bar">
-          <span class="sample-label">Pas de fichier PDF sous la main ?</span>
-          <button type="button" id="pdf-sample-btn" class="btn-sample">
-            <span class="pdf-pill-icon">📄</span>
-            <span>Tester avec un document d'exemple (3 pages)</span>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m9 18 6-6-6-6"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Key features list -->
-        <div class="features-grid">
-          <div class="feature-item">
-            <div class="feature-icon">🔄</div>
-            <div>
-              <h3>Réorganisation Totale</h3>
-              <p>Glissez-déposez les pages avant, après, ou au milieu comme vous le souhaitez.</p>
-            </div>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">☑️</div>
-            <div>
-              <h3>Cocher / Décocher</h3>
-              <p>Toutes les pages sont cochées par défaut. Décochez pour exclure une page du téléchargement.</p>
-            </div>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">📑</div>
-            <div>
-              <h3>Fusion Multi-Fichiers</h3>
-              <p>Importez plusieurs PDF différents et assemblez-les en un seul document ordonné.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- PDF STEP 2: ORGANIZER WORKSPACE -->
-      <section id="pdf-step-2" class="step-card" aria-label="Étape 2 : Réorganiser et exporter le PDF" hidden>
-        <div class="step-indicator">
-          <span class="step-num step-num-2">Étape 2</span>
-          <span class="step-label">Organisez vos pages, cochez/décochez et téléchargez</span>
-        </div>
-
-        <!-- Top Controls & Summary Bar -->
-        <div class="pdf-workspace-header">
-          <div class="pdf-stats-group">
-            <span class="pdf-stats-badge" id="pdf-pages-count">0 pages</span>
-            <span class="pdf-selected-badge" id="pdf-selected-count">0 sélectionnées</span>
-          </div>
-
-          <div class="pdf-batch-actions">
-            <button type="button" id="pdf-select-all-btn" class="btn btn-secondary btn-sm" title="Cocher toutes les pages">
-              ✓ Tout sélectionner
-            </button>
-            <button type="button" id="pdf-deselect-all-btn" class="btn btn-secondary btn-sm" title="Décocher toutes les pages">
-              ✗ Tout désélectionner
-            </button>
-            <button type="button" id="pdf-add-more-btn" class="btn btn-secondary btn-sm" title="Ajouter d'autres fichiers PDF à cette liste">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-              Ajouter des PDF
-            </button>
-            <input type="file" id="pdf-add-more-input" accept="application/pdf" multiple hidden>
-          </div>
-        </div>
-
-        <!-- Hint bar -->
-        <div class="pdf-hint-bar">
-          <span>💡 <strong>Astuce :</strong> Glissez les cartes pour les réordonner, utilisez les flèches <strong>←</strong> / <strong>→</strong>, ou décochez une page pour la masquer du fichier final.</span>
-        </div>
-
-        <!-- Loading pages indicator -->
-        <div id="pdf-loading-indicator" class="pdf-loading-box" hidden>
-          <div class="loader-circle loader-sm"></div>
-          <span id="pdf-loading-text">Extraction des pages et rendu des miniatures...</span>
-        </div>
-
-        <!-- Grid of PDF Pages -->
-        <div id="pdf-pages-grid" class="pdf-pages-grid" aria-label="Grille des pages PDF">
-          <!-- Dynamic page cards rendered here -->
-        </div>
-
-        <!-- Export & Reset Actions Bar -->
-        <div class="result-actions pdf-export-card">
-          <div class="pdf-filename-row">
-            <label for="pdf-export-name" class="filename-label">Nom du fichier final :</label>
-            <div class="filename-input-wrapper">
-              <input type="text" id="pdf-export-name" class="filename-input" value="document-organise.pdf" placeholder="document.pdf">
-            </div>
-          </div>
-
-          <div class="action-buttons-row">
-            <button type="button" id="pdf-download-btn" class="btn btn-save" title="Télécharger le nouveau PDF avec les pages sélectionnées dans l'ordre">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              <span id="pdf-download-btn-text">Télécharger le PDF réorganisé</span>
-            </button>
-          </div>
-
-          <div class="reset-button-wrapper">
-            <button type="button" id="pdf-new-btn" class="btn btn-reset">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 5v14"/>
-                <path d="M5 12h14"/>
-              </svg>
-              <span>Insérer de nouveaux PDF</span>
-            </button>
-          </div>
-        </div>
-      </section>
-    </div>
-
-
-    <!-- ==========================================================================
-         TOOL 3: FILE COMPRESSOR (IMAGES & PDF)
-         ========================================================================== -->
-    <div id="tool-view-compressor" class="tool-view" hidden>
-      <!-- Title Section -->
-      <div class="hero-header">
-        <h1 class="main-title">Compressez et réduisez la taille de vos <span class="gradient-text">fichiers</span></h1>
-        <p class="subtitle">Optimisez vos images (JPG, PNG, WebP) et documents PDF directement dans votre navigateur. Réduisez le poids de vos fichiers jusqu'à 80% sans perte visible.</p>
-      </div>
-
-      <!-- COMPRESSOR STEP 1: IMPORT SECTION -->
-      <section id="compress-step-1" class="step-card active" aria-label="Étape 1 : Importer un fichier à compresser">
-        <div class="step-indicator">
-          <span class="step-num">Étape 1</span>
-          <span class="step-label">Glissez ou sélectionnez une image ou un PDF à compresser</span>
-        </div>
-
-        <div id="compress-dropzone" class="dropzone" tabindex="0" role="button" aria-label="Zone de dépôt de fichier à compresser">
-          <input type="file" id="compress-file-input" accept="image/jpeg, image/png, image/webp, image/avif, application/pdf" hidden>
-          
-          <div class="dropzone-content">
-            <div class="dropzone-icon-wrapper compress-icon-wrapper">
-              <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
-                <path d="M12 12v9"/>
-                <path d="m8 17 4-4 4 4"/>
-              </svg>
-            </div>
-
-            <h2 class="dropzone-title">Glissez-déposez votre image ou PDF ici</h2>
-            <p class="dropzone-desc">Formats supportés : JPG, PNG, WebP et PDF &bull; Jusqu'à 100 Mo</p>
-
-            <div class="dropzone-actions">
-              <button type="button" id="compress-browse-btn" class="btn btn-primary">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="17 8 12 3 7 8"/>
-                  <line x1="12" y1="3" x2="12" y2="15"/>
-                </svg>
-                Parcourir vos fichiers
-              </button>
-
-              <span class="divider-text">ou collez directement avec</span>
-
-              <div class="paste-badge" title="Copiez une image ou un PDF et collez avec Ctrl+V">
-                <kbd class="kbd-key">Ctrl</kbd> + <kbd class="kbd-key">V</kbd>
-                <span class="paste-badge-text">Coller un fichier</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="dropzone-overlay">
-            <div class="overlay-content">
-              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 17V3m0 0L7 8m5-5 5 5"/>
-                <path d="M20 21H4"/>
-              </svg>
-              <span>Relâchez pour lancer l'optimisation !</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sample buttons -->
-        <div class="sample-image-bar">
-          <span class="sample-label">Tester avec un fichier d'exemple :</span>
-          <button type="button" id="compress-sample-img-btn" class="btn-sample">
-            <img src="sample.jpg" alt="Exemple photo" class="sample-thumbnail">
-            <span>Photo HD (JPG)</span>
-          </button>
-          <button type="button" id="compress-sample-pdf-btn" class="btn-sample">
-            <span class="pdf-pill-icon">📄</span>
-            <span>Document (PDF)</span>
-          </button>
-        </div>
-
-        <!-- Features grid -->
-        <div class="features-grid">
-          <div class="feature-item">
-            <div class="feature-icon">⚡</div>
-            <div>
-              <h3>Compression Instantanée</h3>
-              <p>Traitement direct par le processeur de votre appareil sans upload.</p>
-            </div>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">📉</div>
-            <div>
-              <h3>Jusqu'à -80% d'Espace</h3>
-              <p>Réduisez drastiquement la taille pour les emails et les envois web.</p>
-            </div>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">🛡️</div>
-            <div>
-              <h3>100% Confidentiel</h3>
-              <p>Vos documents et photos restent privés et ne quittent jamais votre PC.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- COMPRESSOR STEP 2: SETTINGS & RESULT -->
-      <section id="compress-step-2" class="step-card" aria-label="Étape 2 : Réglages et téléchargement" hidden>
-        <div class="step-indicator">
-          <span class="step-num step-num-2">Étape 2</span>
-          <span class="step-label">Ajustez la compression et téléchargez votre fichier</span>
-        </div>
-
-        <!-- Size Comparison Banner -->
-        <div class="size-comparison-card">
-          <div class="file-summary-header">
-            <div class="file-info-col">
-              <span class="file-type-icon" id="compress-file-icon">🖼️</span>
-              <div>
-                <span class="file-name-title" id="compress-filename">fichier.jpg</span>
-                <span class="file-dims-sub" id="compress-file-sub">Image &bull; Haute résolution</span>
-              </div>
-            </div>
-            <div class="saving-badge" id="compress-saving-badge">-0%</div>
-          </div>
-
-          <div class="size-meter-row">
-            <div class="size-box size-box-original">
-              <span class="size-box-label">Taille originale</span>
-              <span class="size-box-val" id="compress-orig-size">0 Mo</span>
-            </div>
-
-            <div class="size-arrow-col">
-              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </div>
-
-            <div class="size-box size-box-compressed">
-              <span class="size-box-label">Taille compressée</span>
-              <span class="size-box-val" id="compress-result-size">0 Ko</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Compression Controls Toolbar -->
-        <div class="compression-settings-panel">
-          <div class="settings-row">
-            <span class="settings-row-label">Niveau de compression :</span>
-            <div class="presets-buttons-group" role="radiogroup" aria-label="Préréglages de compression">
-              <button type="button" class="preset-btn" data-preset="max" title="Compression maximale : taille minimale pour emails et web">
-                <span>🚀 Maximale</span>
-                <span class="preset-sub">~50%</span>
-              </button>
-              <button type="button" class="preset-btn active" data-preset="balanced" title="Équilibrée : excellent compromis entre qualité et poids">
-                <span>⚖️ Équilibrée</span>
-                <span class="preset-sub">~75% (Recommandé)</span>
-              </button>
-              <button type="button" class="preset-btn" data-preset="light" title="Légère : qualité visuelle maximale">
-                <span>💎 Légère</span>
-                <span class="preset-sub">~90%</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Quality Slider -->
-          <div class="settings-slider-row">
-            <div class="slider-label-group">
-              <label for="compress-quality-slider" class="settings-row-label">Qualité précise :</label>
-              <span class="slider-val-badge" id="compress-quality-val">75%</span>
-            </div>
-            <input type="range" id="compress-quality-slider" min="10" max="95" value="75" class="tool-range-slider compress-range-slider" aria-label="Curseur de qualité de compression">
-          </div>
-
-          <!-- Scale / Resolution Selector (for images) -->
-          <div class="settings-row" id="compress-scale-row">
-            <span class="settings-row-label">Dimensions / Échelle :</span>
-            <div class="scale-buttons-group">
-              <button type="button" class="scale-btn active" data-scale="1.0">100% (Original)</button>
-              <button type="button" class="scale-btn" data-scale="0.8">80%</button>
-              <button type="button" class="scale-btn" data-scale="0.6">60%</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Preview Area -->
-        <div class="compress-preview-wrapper">
-          <div class="compress-preview-stage" id="compress-preview-stage">
-            <img id="compress-img-preview" class="compress-preview-image" alt="Aperçu du fichier compressé" hidden>
-            <canvas id="compress-canvas-preview" class="compress-preview-canvas" hidden></canvas>
-          </div>
-          <div class="compress-live-indicator" id="compress-status-indicator">
-            <span class="live-pulse"></span>
-            <span id="compress-status-text">Prêt au téléchargement</span>
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="result-actions">
-          <div class="action-buttons-row">
-            <button type="button" id="compress-download-btn" class="btn btn-save" title="Télécharger le fichier compressé">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              <span id="compress-download-btn-text">Télécharger le fichier compressé</span>
-            </button>
-          </div>
-
-          <div class="reset-button-wrapper">
-            <button type="button" id="compress-new-btn" class="btn btn-reset">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 5v14"/>
-                <path d="M5 12h14"/>
-              </svg>
-              <span>Compresser un autre fichier</span>
-            </button>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- ==========================================================================
-         TOOL 4: PHOTO MERGER & ASSEMBLER (FUSION PHOTO)
-         ========================================================================== -->
-    <div id="tool-view-photo-merger" class="tool-view" hidden>
-      <!-- Title Section -->
-      <div class="hero-header">
-        <h1 class="main-title">Assemblez et <span class="gradient-text">fusionnez vos photos</span></h1>
-        <p class="subtitle">Combinez jusqu'à 100 photos en une seule image parfaitement alignée directement dans votre navigateur. Grille personnalisée, côte à côte ou empilées verticalement.</p>
-      </div>
-
-      <!-- Main Photo Merger Studio Container -->
-      <section class="step-card merger-studio-card" aria-label="Studio d'assemblage photo">
-        <!-- Top Studio Bar with Photo Counter & Global Actions -->
-        <div class="merger-top-bar">
-          <div class="merger-top-left">
-            <div class="photo-counter-badge" id="pm-photo-counter">
-              <span class="count-num" id="pm-count-num">0</span> / 100 photos
-            </div>
-            <span class="merger-privacy-hint">100% en local &bull; Traitement instantané</span>
-          </div>
-
-          <div class="merger-top-actions">
-            <button type="button" id="pm-clear-btn" class="btn btn-ghost danger-ghost" title="Effacer toutes les photos" disabled>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-              <span>Réinitialiser</span>
-            </button>
-            <button type="button" id="pm-download-btn" class="btn btn-save" title="Télécharger l'image assemblée" disabled>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              <span>Télécharger l'image finale</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Studio Workspace: Sidebar Controls (Left) + Viewport Stage (Right) -->
-        <div class="merger-workspace-grid">
-          
-          <!-- LEFT COLUMN: CONTROLS & PHOTO LIST -->
-          <aside class="merger-sidebar">
-            
-            <!-- 1. Selection & Dropzone -->
-            <div class="merger-panel-box">
-              <div class="panel-box-header">
-                <span class="panel-step-badge">1</span>
-                <span class="panel-box-title">Sélection des photos</span>
-              </div>
-
-              <div class="pm-dropzone" id="pm-dropzone" tabindex="0" role="button" aria-label="Zone d'importation de photos">
-                <input type="file" id="pm-file-input" multiple accept="image/*" hidden />
-                <div class="pm-dropzone-inner">
-                  <div class="pm-drop-icon">
-                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="17 8 12 3 7 8"/>
-                      <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                  </div>
-                  <p class="pm-drop-main">Glissez vos photos ici</p>
-                  <p class="pm-drop-sub">ou <span class="browse-link" id="pm-browse-trigger">parcourez vos fichiers</span></p>
-                  <div class="pm-paste-hint">
-                    <kbd class="kbd-key">Ctrl</kbd> + <kbd class="kbd-key">V</kbd> pour coller une image
-                  </div>
-                </div>
-              </div>
-
-              <!-- Quick Sample Button -->
-              <div class="pm-sample-row">
-                <button type="button" id="pm-sample-btn" class="btn btn-ghost pm-btn-sample" title="Charger des photos d'exemple">
-                  <span>📸 Charger des photos d'exemple</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- 2. Photos Reorder & List -->
-            <div class="merger-panel-box">
-              <div class="panel-box-header space-between">
-                <div class="panel-header-title-group">
-                  <span class="panel-step-badge">2</span>
-                  <span class="panel-box-title">Ordre des photos</span>
-                </div>
-                <div class="pm-sort-actions">
-                  <button type="button" id="pm-sort-name-btn" class="btn-micro" title="Trier par nom (A-Z)">A-Z</button>
-                  <button type="button" id="pm-reverse-btn" class="btn-micro" title="Inverser l'ordre des photos">⇅ Inverser</button>
-                </div>
-              </div>
-
-              <div class="pm-thumbnail-container" id="pm-thumbnail-container">
-                <div class="pm-empty-notice" id="pm-empty-notice">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                    <polyline points="21 15 16 10 5 21"/>
-                  </svg>
-                  <p>Aucune photo sélectionnée</p>
-                </div>
-                <ul class="pm-thumbnail-list" id="pm-thumbnail-list"></ul>
-              </div>
-            </div>
-
-            <!-- 3. Layout & Alignment Settings -->
-            <div class="merger-panel-box">
-              <div class="panel-box-header">
-                <span class="panel-step-badge">3</span>
-                <span class="panel-box-title">Disposition & Alignement</span>
-              </div>
-
-              <!-- Layout Mode Segmented -->
-              <div class="pm-field-group">
-                <label class="pm-field-label">Mode d'alignement</label>
-                <div class="segmented-control pm-layout-segmented" id="pm-layout-control">
-                  <button type="button" data-layout="horizontal" class="segmented-btn active" title="Toutes les photos sur une ligne côte à côte">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="2" y="7" width="6" height="10" rx="1"/>
-                      <rect x="9" y="7" width="6" height="10" rx="1"/>
-                      <rect x="16" y="7" width="6" height="10" rx="1"/>
-                    </svg>
-                    <span>Côte à côte</span>
-                  </button>
-                  <button type="button" data-layout="grid" class="segmented-btn" title="Grille multi-colonnes">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="3" y="3" width="7" height="7" rx="1"/>
-                      <rect x="14" y="3" width="7" height="7" rx="1"/>
-                      <rect x="3" y="14" width="7" height="7" rx="1"/>
-                      <rect x="14" y="14" width="7" height="7" rx="1"/>
-                    </svg>
-                    <span>Grille</span>
-                  </button>
-                  <button type="button" data-layout="vertical" class="segmented-btn" title="Empilées verticalement">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="7" y="2" width="10" height="6" rx="1"/>
-                      <rect x="7" y="9" width="10" height="6" rx="1"/>
-                      <rect x="7" y="16" width="10" height="6" rx="1"/>
-                    </svg>
-                    <span>Vertical</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Grid Columns Option (shown only if grid selected) -->
-              <div class="pm-field-group" id="pm-columns-group" style="display: none;">
-                <div class="pm-label-row">
-                  <label class="pm-field-label" for="pm-cols-input">Colonnes dans la grille</label>
-                  <span class="value-badge" id="pm-cols-val">4</span>
-                </div>
-                <div class="pm-cols-input-row">
-                  <input type="number" id="pm-cols-input" min="1" max="50" value="4" class="custom-number-input" />
-                  <input type="range" id="pm-cols-range" min="1" max="30" value="4" class="tool-range-slider" />
-                </div>
-              </div>
-
-              <!-- Spacing & Padding Sliders -->
-              <div class="pm-fields-row-2">
-                <div class="pm-field-group">
-                  <div class="pm-label-row">
-                    <label class="pm-field-label" for="pm-spacing-range">Espacement</label>
-                    <span class="value-badge" id="pm-spacing-val">10 px</span>
-                  </div>
-                  <input type="range" id="pm-spacing-range" min="0" max="60" value="10" class="tool-range-slider" />
-                </div>
-
-                <div class="pm-field-group">
-                  <div class="pm-label-row">
-                    <label class="pm-field-label" for="pm-padding-range">Marge externe</label>
-                    <span class="value-badge" id="pm-padding-val">15 px</span>
-                  </div>
-                  <input type="range" id="pm-padding-range" min="0" max="80" value="15" class="tool-range-slider" />
-                </div>
-              </div>
-
-              <!-- Radius & Fit Mode -->
-              <div class="pm-fields-row-2">
-                <div class="pm-field-group">
-                  <div class="pm-label-row">
-                    <label class="pm-field-label" for="pm-radius-range">Coins arrondis</label>
-                    <span class="value-badge" id="pm-radius-val">6 px</span>
-                  </div>
-                  <input type="range" id="pm-radius-range" min="0" max="30" value="6" class="tool-range-slider" />
-                </div>
-
-                <div class="pm-field-group">
-                  <label class="pm-field-label" for="pm-fit-mode">Ajustement</label>
-                  <select id="pm-fit-mode" class="custom-select">
-                    <option value="contain">Conserver proportions</option>
-                    <option value="crop">Remplir les cases (Rogné)</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Background Color Presets -->
-              <div class="pm-field-group">
-                <label class="pm-field-label">Couleur d'arrière-plan</label>
-                <div class="pm-color-presets">
-                  <button type="button" class="color-preset active" data-color="#0b0f19" style="background-color: #0b0f19;" title="Sombre studio"></button>
-                  <button type="button" class="color-preset" data-color="#ffffff" style="background-color: #ffffff;" title="Blanc pur"></button>
-                  <button type="button" class="color-preset" data-color="#000000" style="background-color: #000000;" title="Noir pur"></button>
-                  <button type="button" class="color-preset" data-color="transparent" style="background: repeating-conic-gradient(#444 0% 25%, #222 0% 50%) 50% / 10px 10px;" title="Damier transparent"></button>
-                  <div class="pm-color-picker-wrap" title="Choisir une couleur personnalisée">
-                    <input type="color" id="pm-custom-color" value="#0b0f19" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 4. Quality & Format -->
-            <div class="merger-panel-box">
-              <div class="panel-box-header">
-                <span class="panel-step-badge">4</span>
-                <span class="panel-box-title">Qualité & Export</span>
-              </div>
-
-              <div class="pm-field-group">
-                <div class="pm-label-row">
-                  <label class="pm-field-label" for="pm-quality-range">Qualité d'image</label>
-                  <span class="value-badge" id="pm-quality-val">85 %</span>
-                </div>
-                <input type="range" id="pm-quality-range" min="40" max="100" value="85" class="tool-range-slider" />
-              </div>
-
-              <div class="pm-fields-row-2">
-                <div class="pm-field-group">
-                  <label class="pm-field-label" for="pm-max-res">Résolution max</label>
-                  <select id="pm-max-res" class="custom-select">
-                    <option value="4096">Standard (4096 px)</option>
-                    <option value="6144" selected>Haute Définition (6144 px)</option>
-                    <option value="8192">Très Haute Définition (8192 px)</option>
-                    <option value="12288">Ultra HD (12288 px)</option>
-                  </select>
-                </div>
-
-                <div class="pm-field-group">
-                  <label class="pm-field-label" for="pm-format-select">Format</label>
-                  <select id="pm-format-select" class="custom-select">
-                    <option value="image/jpeg">JPEG (.jpg)</option>
-                    <option value="image/png">PNG (.png)</option>
-                    <option value="image/webp">WebP (.webp)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </aside>
-
-          <!-- RIGHT COLUMN: VIEWPORT STAGE & PREVIEW -->
-          <div class="merger-viewport-area">
-            
-            <!-- Viewport Toolbar (Metrics + Zoom + Copy) -->
-            <div class="pm-viewport-header">
-              <div class="pm-viewport-info">
-                <span class="pm-info-title">Aperçu de la composition</span>
-                <div class="pm-metrics-row" id="pm-metrics" style="display: none;">
-                  <span class="metric-pill" id="pm-dim-pill">0 × 0 px</span>
-                  <span class="metric-pill" id="pm-size-pill">~0 MB</span>
-                </div>
-              </div>
-
-              <div class="pm-viewport-tools">
-                <button type="button" id="pm-zoom-out-btn" class="btn-icon" title="Dézoomer">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    <line x1="8" y1="11" x2="14" y2="11"/>
-                  </svg>
-                </button>
-                <span id="pm-zoom-level" class="zoom-level">100%</span>
-                <button type="button" id="pm-zoom-in-btn" class="btn-icon" title="Zoomer">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    <line x1="11" y1="8" x2="11" y2="14"/>
-                    <line x1="8" y1="11" x2="14" y2="11"/>
-                  </svg>
-                </button>
-                <button type="button" id="pm-reset-zoom-btn" class="btn-icon" title="Ajuster à 100%">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
-                  </svg>
-                </button>
-                <button type="button" id="pm-copy-btn" class="btn-icon" title="Copier l'image dans le presse-papier" disabled>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <!-- Canvas Stage Wrapper with Scroll & Zoom -->
-            <div class="pm-canvas-stage-wrapper" id="pm-canvas-wrapper">
-              <!-- Loading Overlay -->
-              <div class="pm-loading-overlay" id="pm-loading-overlay" style="display: none;">
-                <div class="loading-spinner"></div>
-                <p class="loading-label">Assemblage de l'image en cours...</p>
-              </div>
-
-              <!-- Placeholder when empty -->
-              <div class="pm-placeholder" id="pm-placeholder">
-                <div class="pm-placeholder-icon">
-                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
-                    <rect x="3" y="3" width="18" height="18" rx="3"/>
-                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                    <polyline points="21 15 16 10 5 21"/>
-                  </svg>
-                </div>
-                <h3>Votre composition apparaîtra ici</h3>
-                <p>Importez vos photos dans le panneau de gauche pour générer automatiquement l'assemblage.</p>
-              </div>
-
-              <canvas id="pm-output-canvas" class="pm-output-canvas" style="display: none;"></canvas>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-
     <!-- Main Footer -->
     <footer class="app-footer">
       <div class="footer-content">
@@ -1195,7 +438,7 @@
   <!-- Notification Toast -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <!-- Main Application Script -->
-  <script type="module" src="app.js"></script>
+  <!-- Dedicated Background Remover Script -->
+  <script type="module" src="bg-remover.js"></script>
 </body>
 </html>

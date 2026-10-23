@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assembleur & Fusion Photo — Studio Photo (OmniTools)</title>
+  <meta name="description" content="Combinez jusqu'à 100 photos en une seule image directement dans votre navigateur. Grille personnalisée, côte à côte ou empilées verticalement. 100% privé, sans backend.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='7' height='7' x='3' y='3' rx='1'/><rect width='7' height='7' x='14' y='3' rx='1'/><rect width='7' height='7' x='14' y='14' rx='1'/><rect width='7' height='7' x='3' y='14' rx='1'/></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow effects -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-grid"></div>
+
+  <div class="app-container">
+    <!-- Header with Interactive Tool Dropdown -->
+    <header class="app-header">
+      <div class="brand-dropdown-container">
+        <!-- Dropdown Selector Button -->
+        <button type="button" id="tool-dropdown-btn" class="tool-dropdown-btn" aria-haspopup="true" aria-expanded="false" title="Changer d'outil">
+          <div class="tool-btn-icon" id="header-tool-icon">🖼️</div>
+          <div class="tool-btn-info">
+            <span class="tool-btn-name" id="header-tool-name">Assembleur & Fusion Photo</span>
+            <span class="tool-btn-sub">Outils locaux &bull; Changer d'outil</span>
+          </div>
+          <svg class="chevron-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="tool-dropdown-menu" class="tool-dropdown-menu" role="menu" hidden>
+          <div class="dropdown-header">Sélectionnez un outil :</div>
+          
+          <!-- Item 1: ClearCut (Background Remover) -->
+          <a href="index.html" class="tool-dropdown-item" role="menuitem">
+            <div class="item-icon bg-remover-icon">✂️</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Détourage d'image (ClearCut)</span>
+              </div>
+              <p class="item-desc">Supprimez et retouchez l'arrière-plan de vos photos avec précision.</p>
+            </div>
+          </a>
+
+          <!-- Item 2: PDF Organizer -->
+          <a href="pdf-organizer.html" class="tool-dropdown-item" role="menuitem">
+            <div class="item-icon pdf-organizer-icon">📑</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Organisateur de PDF</span>
+              </div>
+              <p class="item-desc">Réorganisez, déplacez, pivotez et supprimez des pages de vos PDF.</p>
+            </div>
+          </a>
+
+          <!-- Item 3: File Compressor -->
+          <a href="compressor.html" class="tool-dropdown-item" role="menuitem">
+            <div class="item-icon compressor-icon">🗜️</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Compresseur de fichiers</span>
+              </div>
+              <p class="item-desc">Réduisez le poids de vos images et documents PDF sans perte visible.</p>
+            </div>
+          </a>
+
+          <!-- Item 4: Photo Merger / Assembler -->
+          <a href="photo-merger.html" class="tool-dropdown-item active" role="menuitem">
+            <div class="item-icon photo-merger-icon">🖼️</div>
+            <div class="item-content">
+              <div class="item-title-row">
+                <span class="item-title">Assembleur & Fusion Photo</span>
+              </div>
+              <p class="item-desc">Combinez jusqu'à 100 photos en une seule image (grille, côte à côte, empilées).</p>
+            </div>
+            <div class="item-check">✓</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="header-badges">
+        <div class="privacy-pill">
+          <span class="status-dot"></span>
+          <span>100% In-Browser &bull; Sans Serveur &bull; Privé</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==========================================================================
+         PHOTO MERGER & ASSEMBLER TOOL VIEW
+         ========================================================================== -->
+    <div id="tool-view-photo-merger" class="tool-view active">
+      <!-- Title Section -->
+      <div class="hero-header">
+        <h1 class="main-title">Assemblez et <span class="gradient-text">fusionnez vos photos</span></h1>
+        <p class="subtitle">Combinez jusqu'à 100 photos en une seule image parfaitement alignée directement dans votre navigateur. Grille personnalisée, côte à côte ou empilées verticalement.</p>
+      </div>
+
+      <!-- Main Photo Merger Studio Container -->
+      <section class="step-card merger-studio-card" aria-label="Studio d'assemblage photo">
+        <!-- Top Studio Bar with Photo Counter & Global Actions -->
+        <div class="merger-top-bar">
+          <div class="merger-top-left">
+            <div class="photo-counter-badge" id="pm-photo-counter">
+              <span class="count-num" id="pm-count-num">0</span> / 100 photos
+            </div>
+            <span class="merger-privacy-hint">100% en local &bull; Traitement instantané</span>
+          </div>
+
+          <div class="merger-top-actions">
+            <button type="button" id="pm-clear-btn" class="btn btn-ghost danger-ghost" title="Effacer toutes les photos" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span>Réinitialiser</span>
+            </button>
+            <button type="button" id="pm-download-btn" class="btn btn-save" title="Télécharger l'image assemblée" disabled>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Télécharger l'image finale</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Studio Workspace: Sidebar Controls (Left) + Viewport Stage (Right) -->
+        <div class="merger-workspace-grid">
+          
+          <!-- LEFT COLUMN: CONTROLS & PHOTO LIST -->
+          <aside class="merger-sidebar">
+            
+            <!-- 1. Selection & Dropzone -->
+            <div class="merger-panel-box">
+              <div class="panel-box-header">
+                <span class="panel-step-badge">1</span>
+                <span class="panel-box-title">Sélection des photos</span>
+              </div>
+
+              <div class="pm-dropzone" id="pm-dropzone" tabindex="0" role="button" aria-label="Zone d'importation de photos">
+                <input type="file" id="pm-file-input" multiple accept="image/*" hidden />
+                <div class="pm-dropzone-inner">
+                  <div class="pm-drop-icon">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                  </div>
+                  <p class="pm-drop-main">Glissez vos photos ici</p>
+                  <p class="pm-drop-sub">ou <span class="browse-link" id="pm-browse-trigger">parcourez vos fichiers</span></p>
+                  <div class="pm-paste-hint">
+                    <kbd class="kbd-key">Ctrl</kbd> + <kbd class="kbd-key">V</kbd> pour coller une image
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Sample Button -->
+              <div class="pm-sample-row">
+                <button type="button" id="pm-sample-btn" class="btn btn-ghost pm-btn-sample" title="Charger des photos d'exemple">
+                  <span>📸 Charger des photos d'exemple</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Photos Reorder & List -->
+            <div class="merger-panel-box">
+              <div class="panel-box-header space-between">
+                <div class="panel-header-title-group">
+                  <span class="panel-step-badge">2</span>
+                  <span class="panel-box-title">Ordre des photos</span>
+                </div>
+                <div class="pm-sort-actions">
+                  <button type="button" id="pm-sort-name-btn" class="btn-micro" title="Trier par nom (A-Z)">A-Z</button>
+                  <button type="button" id="pm-reverse-btn" class="btn-micro" title="Inverser l'ordre des photos">⇅ Inverser</button>
+                </div>
+              </div>
+
+              <div class="pm-thumbnail-container" id="pm-thumbnail-container">
+                <div class="pm-empty-notice" id="pm-empty-notice">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                  <p>Aucune photo sélectionnée</p>
+                </div>
+                <ul class="pm-thumbnail-list" id="pm-thumbnail-list"></ul>
+              </div>
+            </div>
+
+            <!-- 3. Layout & Alignment Settings -->
+            <div class="merger-panel-box">
+              <div class="panel-box-header">
+                <span class="panel-step-badge">3</span>
+                <span class="panel-box-title">Disposition & Alignement</span>
+              </div>
+
+              <!-- Layout Mode Segmented -->
+              <div class="pm-field-group">
+                <label class="pm-field-label">Mode d'alignement</label>
+                <div class="segmented-control pm-layout-segmented" id="pm-layout-control">
+                  <button type="button" data-layout="horizontal" class="segmented-btn active" title="Toutes les photos sur une ligne côte à côte">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="7" width="6" height="10" rx="1"/>
+                      <rect x="9" y="7" width="6" height="10" rx="1"/>
+                      <rect x="16" y="7" width="6" height="10" rx="1"/>
+                    </svg>
+                    <span>Côte à côte</span>
+                  </button>
+                  <button type="button" data-layout="grid" class="segmented-btn" title="Grille multi-colonnes">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="7" height="7" rx="1"/>
+                      <rect x="14" y="3" width="7" height="7" rx="1"/>
+                      <rect x="3" y="14" width="7" height="7" rx="1"/>
+                      <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    <span>Grille</span>
+                  </button>
+                  <button type="button" data-layout="vertical" class="segmented-btn" title="Empilées verticalement">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="7" y="2" width="10" height="6" rx="1"/>
+                      <rect x="7" y="9" width="10" height="6" rx="1"/>
+                      <rect x="7" y="16" width="10" height="6" rx="1"/>
+                    </svg>
+                    <span>Vertical</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Grid Columns Option (shown only if grid selected) -->
+              <div class="pm-field-group" id="pm-columns-group" style="display: none;">
+                <div class="pm-label-row">
+                  <label class="pm-field-label" for="pm-cols-input">Colonnes dans la grille</label>
+                  <span class="value-badge" id="pm-cols-val">4</span>
+                </div>
+                <div class="pm-cols-input-row">
+                  <input type="number" id="pm-cols-input" min="1" max="50" value="4" class="custom-number-input" />
+                  <input type="range" id="pm-cols-range" min="1" max="30" value="4" class="tool-range-slider" />
+                </div>
+              </div>
+
+              <!-- Spacing & Padding Sliders -->
+              <div class="pm-fields-row-2">
+                <div class="pm-field-group">
+                  <div class="pm-label-row">
+                    <label class="pm-field-label" for="pm-spacing-range">Espacement</label>
+                    <span class="value-badge" id="pm-spacing-val">10 px</span>
+                  </div>
+                  <input type="range" id="pm-spacing-range" min="0" max="60" value="10" class="tool-range-slider" />
+                </div>
+
+                <div class="pm-field-group">
+                  <div class="pm-label-row">
+                    <label class="pm-field-label" for="pm-padding-range">Marge externe</label>
+                    <span class="value-badge" id="pm-padding-val">15 px</span>
+                  </div>
+                  <input type="range" id="pm-padding-range" min="0" max="80" value="15" class="tool-range-slider" />
+                </div>
+              </div>
+
+              <!-- Radius & Fit Mode -->
+              <div class="pm-fields-row-2">
+                <div class="pm-field-group">
+                  <div class="pm-label-row">
+                    <label class="pm-field-label" for="pm-radius-range">Coins arrondis</label>
+                    <span class="value-badge" id="pm-radius-val">6 px</span>
+                  </div>
+                  <input type="range" id="pm-radius-range" min="0" max="30" value="6" class="tool-range-slider" />
+                </div>
+
+                <div class="pm-field-group">
+                  <label class="pm-field-label" for="pm-fit-mode">Ajustement</label>
+                  <select id="pm-fit-mode" class="custom-select">
+                    <option value="contain">Conserver proportions</option>
+                    <option value="crop">Remplir les cases (Rogné)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Background Color Presets -->
+              <div class="pm-field-group">
+                <label class="pm-field-label">Couleur d'arrière-plan</label>
+                <div class="pm-color-presets">
+                  <button type="button" class="color-preset active" data-color="#0b0f19" style="background-color: #0b0f19;" title="Sombre studio"></button>
+                  <button type="button" class="color-preset" data-color="#ffffff" style="background-color: #ffffff;" title="Blanc pur"></button>
+                  <button type="button" class="color-preset" data-color="#000000" style="background-color: #000000;" title="Noir pur"></button>
+                  <button type="button" class="color-preset" data-color="transparent" style="background: repeating-conic-gradient(#444 0% 25%, #222 0% 50%) 50% / 10px 10px;" title="Damier transparent"></button>
+                  <div class="pm-color-picker-wrap" title="Choisir une couleur personnalisée">
+                    <input type="color" id="pm-custom-color" value="#0b0f19" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Quality & Format -->
+            <div class="merger-panel-box">
+              <div class="panel-box-header">
+                <span class="panel-step-badge">4</span>
+                <span class="panel-box-title">Qualité & Export</span>
+              </div>
+
+              <div class="pm-field-group">
+                <div class="pm-label-row">
+                  <label class="pm-field-label" for="pm-quality-range">Qualité d'image</label>
+                  <span class="value-badge" id="pm-quality-val">85 %</span>
+                </div>
+                <input type="range" id="pm-quality-range" min="40" max="100" value="85" class="tool-range-slider" />
+              </div>
+
+              <div class="pm-fields-row-2">
+                <div class="pm-field-group">
+                  <label class="pm-field-label" for="pm-max-res">Résolution max</label>
+                  <select id="pm-max-res" class="custom-select">
+                    <option value="4096">Standard (4096 px)</option>
+                    <option value="6144" selected>Haute Définition (6144 px)</option>
+                    <option value="8192">Très Haute Définition (8192 px)</option>
+                    <option value="12288">Ultra HD (12288 px)</option>
+                  </select>
+                </div>
+
+                <div class="pm-field-group">
+                  <label class="pm-field-label" for="pm-format-select">Format</label>
+                  <select id="pm-format-select" class="custom-select">
+                    <option value="image/jpeg">JPEG (.jpg)</option>
+                    <option value="image/png">PNG (.png)</option>
+                    <option value="image/webp">WebP (.webp)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- RIGHT COLUMN: VIEWPORT STAGE & PREVIEW -->
+          <div class="merger-viewport-area">
+            
+            <!-- Viewport Toolbar (Metrics + Zoom + Copy) -->
+            <div class="pm-viewport-header">
+              <div class="pm-viewport-info">
+                <span class="pm-info-title">Aperçu de la composition</span>
+                <div class="pm-metrics-row" id="pm-metrics" style="display: none;">
+                  <span class="metric-pill" id="pm-dim-pill">0 × 0 px</span>
+                  <span class="metric-pill" id="pm-size-pill">~0 MB</span>
+                </div>
+              </div>
+
+              <div class="pm-viewport-tools">
+                <button type="button" id="pm-zoom-out-btn" class="btn-icon" title="Dézoomer">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    <line x1="8" y1="11" x2="14" y2="11"/>
+                  </svg>
+                </button>
+                <span id="pm-zoom-level" class="zoom-level">100%</span>
+                <button type="button" id="pm-zoom-in-btn" class="btn-icon" title="Zoomer">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    <line x1="11" y1="8" x2="11" y2="14"/>
+                    <line x1="8" y1="11" x2="14" y2="11"/>
+                  </svg>
+                </button>
+                <button type="button" id="pm-reset-zoom-btn" class="btn-icon" title="Ajuster à 100%">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                  </svg>
+                </button>
+                <button type="button" id="pm-copy-btn" class="btn-icon" title="Copier l'image dans le presse-papier" disabled>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Canvas Stage Wrapper with Scroll & Zoom -->
+            <div class="pm-canvas-stage-wrapper" id="pm-canvas-wrapper">
+              <!-- Loading Overlay -->
+              <div class="pm-loading-overlay" id="pm-loading-overlay" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p class="loading-label">Assemblage de l'image en cours...</p>
+              </div>
+
+              <!-- Placeholder when empty -->
+              <div class="pm-placeholder" id="pm-placeholder">
+                <div class="pm-placeholder-icon">
+                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+                    <rect x="3" y="3" width="18" height="18" rx="3"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </div>
+                <h3>Votre composition apparaîtra ici</h3>
+                <p>Importez vos photos dans le panneau de gauche pour générer automatiquement l'assemblage.</p>
+              </div>
+
+              <canvas id="pm-output-canvas" class="pm-output-canvas" style="display: none;"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Main Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>OmniTools &bull; Suite d'outils 100% Client-Side conçus pour <strong>GitHub Pages</strong> &bull; Sans backend</p>
+        <div class="footer-links">
+          <span class="badge-tech">ISNet FP32 AI</span>
+          <span class="badge-tech">PDF-Lib & PDF.js</span>
+          <span class="badge-tech">0 Serveur / 100% Privé</span>
+          <span class="badge-tech">GitHub Pages Ready</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Dedicated Photo Merger Script -->
+  <script type="module" src="photo-merger.js"></script>
+</body>
+</html>
