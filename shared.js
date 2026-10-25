@@ -30,7 +30,7 @@ export const TOOLS = [
     icon: '🗜️',
     iconClass: 'compressor-icon',
     url: 'compressor.html',
-    desc: "Réduisez le poids de vos images et documents PDF sans perte visible."
+    desc: "Réduisez le poids de vos vidéos, images et documents PDF sans perte visible."
   },
   {
     id: 'photo-merger',
