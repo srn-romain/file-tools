@@ -10,7 +10,7 @@ Chaque outil dispose de sa **propre page HTML et de son propre fichier JS dédi�
 
 | Outil | Page HTML | Fichier JS | Description |
 |---|---|---|---|
-| ✂️ **Détourage d'image** | [index.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/index.html) | [bg-remover.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/bg-remover.js) | Détourage IA (ISNet FP32), retouche manuelle (gomme / restauration), prévisualisation avant/après. |
+| ✂️ **Remove Background** | [index.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/index.html) | [bg-remover.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/bg-remover.js) | Détourage IA (ISNet FP32), retouche manuelle (gomme / restauration), prévisualisation avant/après. |
 | 📑 **Organisateur de PDF** | [pdf-organizer.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/pdf-organizer.html) | [pdf-organizer.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/pdf-organizer.js) | Réorganisation des pages, rotation 90°, exclusion de pages et fusion de plusieurs PDF. |
 | 🗜️ **Compresseur de fichiers** | [compressor.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/compressor.html) | [compressor.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/compressor.js) | Réduction de taille (JPG, PNG, WebP et PDF) jusqu'à -80% sans perte visible. |
 | 🖼️ **Assembleur Photo** | [photo-merger.html](file:///c:/Users/Sieur/WebstormProjects/remove-background/photo-merger.html) | [photo-merger.js](file:///c:/Users/Sieur/WebstormProjects/remove-background/photo-merger.js) | Fusion jusqu'à 100 photos en 1 image (grille sur-mesure, côte à côte, vertical). |
@@ -21,7 +21,7 @@ Chaque outil dispose de sa **propre page HTML et de son propre fichier JS dédi�
 
 ---
 
-## ✍️ Outil : Remplir un PDF (Formulaires & Texte)
+## ✍️ Outil : Remplir un PDF
 
 Remplissez vos documents PDF, Cerfa, contrats ou factures directement dans votre navigateur sans avoir à les imprimer :
 - **Saisie directe au clic** : Cliquez à l'endroit désiré sur le document pour créer un champ de texte.
@@ -85,7 +85,7 @@ Manipulez, réorganisez, pivotez et allégez vos documents PDF directement sur v
 
 ---
 
-## ✂️ Outil 4 : Détourage d'image par IA (ClearCut)
+## ✂️ Outil 4 : Remove Background par IA
 
 Détourage automatique et retouche haute précision inspirée de [remove.bg](https://www.remove.bg/fr/upload) :
 - Modèle IA ISNet FP32 pour les cheveux et contours fins.

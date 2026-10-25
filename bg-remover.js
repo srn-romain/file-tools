@@ -4,7 +4,7 @@
  */
 
 import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.8/+esm';
-import { showToast, initSharedUI } from './shared.js?v=3';
+import { showToast, initSharedUI } from './shared.js?v=4';
 
 // DOM Elements: Step 1
 const step1 = document.getElementById('step-1');

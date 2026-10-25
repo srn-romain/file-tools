@@ -3,7 +3,7 @@
  * 100% Client-Side multi-photo arrangement & canvas rendering
  */
 
-import { showToast, initSharedUI } from './shared.js?v=3';
+import { showToast, initSharedUI } from './shared.js?v=4';
 
 const pmState = {
   photos: [], // Array of { id, file, name, img, width, height, aspect, url }

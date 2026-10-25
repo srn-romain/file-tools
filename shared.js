@@ -7,8 +7,8 @@
 export const TOOLS = [
   {
     id: 'bg-remover',
-    name: "Détourage d'image",
-    fullName: "Détourage d'image (ClearCut)",
+    name: "Remove Background",
+    fullName: "Remove Background",
     icon: '✂️',
     iconClass: 'bg-remover-icon',
     url: 'index.html',
@@ -17,7 +17,7 @@ export const TOOLS = [
   {
     id: 'pdf-organizer',
     name: "Organisateur de PDF",
-    fullName: "Organisateur de PDF (PDF Studio)",
+    fullName: "Organisateur de PDF",
     icon: '📑',
     iconClass: 'pdf-organizer-icon',
     url: 'pdf-organizer.html',
@@ -35,7 +35,7 @@ export const TOOLS = [
   {
     id: 'photo-merger',
     name: "Assembleur Photo",
-    fullName: "Assembleur & Fusion Photo",
+    fullName: "Assembleur Photo",
     icon: '🖼️',
     iconClass: 'photo-merger-icon',
     url: 'photo-merger.html',
@@ -44,7 +44,7 @@ export const TOOLS = [
   {
     id: 'pdf-filler',
     name: "Remplir un PDF",
-    fullName: "Remplir un PDF (Formulaire & Texte)",
+    fullName: "Remplir un PDF",
     icon: '✍️',
     iconClass: 'pdf-filler-icon',
     url: 'pdf-filler.html',

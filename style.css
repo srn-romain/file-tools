@@ -1569,6 +1569,16 @@ body {
   filter: brightness(1.06);
 }
 
+.btn-save:disabled,
+.btn-start-video:disabled,
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.25);
+  box-shadow: none;
+  transform: none !important;
+}
+
 .btn-reset {
   width: 100%;
   padding: 14px 24px;

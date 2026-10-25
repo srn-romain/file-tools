@@ -5,7 +5,7 @@
  * 100% Client-Side with PDF.js, PDF-Lib, Mammoth.js & Docx
  */
 
-import { showToast, initSharedUI } from './shared.js?v=3';
+import { showToast, initSharedUI } from './shared.js?v=4';
 
 // Configure PDF.js Worker
 const pdfjs = window.pdfjsLib || window['pdfjs-dist/build/pdf'];

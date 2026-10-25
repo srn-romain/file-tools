@@ -3,7 +3,7 @@
  * 100% Client-Side compression with Canvas, MediaRecorder & PDF-Lib
  */
 
-import { showToast, initSharedUI } from './shared.js?v=3';
+import { showToast, initSharedUI } from './shared.js?v=4';
 
 // Configure PDF.js Worker
 const pdfjs = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
@@ -80,6 +80,7 @@ let videoDuration = 0;
 let videoWidth = 0;
 let videoHeight = 0;
 let activeVideoProcessor = null;
+let autoDownloadPending = false;
 
 function formatFileSize(bytes) {
   if (!bytes || bytes === 0) return '0 Octets';
@@ -211,7 +212,7 @@ export function initCompressor() {
       compressQualityVal.textContent = currentQuality + '%';
 
       if (currentFileType === 'video') {
-        updateVideoEstimate();
+        onVideoSettingsChanged();
       } else {
         scheduleCompression();
       }
@@ -225,7 +226,7 @@ export function initCompressor() {
     presetButtons.forEach(b => b.classList.remove('active'));
 
     if (currentFileType === 'video') {
-      updateVideoEstimate();
+      onVideoSettingsChanged();
     } else {
       scheduleCompression();
     }
@@ -239,8 +240,7 @@ export function initCompressor() {
       currentScale = parseFloat(btn.dataset.scale);
 
       if (currentFileType === 'video') {
-        updatePresetLabels();
-        updateVideoEstimate();
+        onVideoSettingsChanged();
       } else {
         scheduleCompression();
       }
@@ -251,8 +251,7 @@ export function initCompressor() {
   if (compressAudioToggle) {
     compressAudioToggle.addEventListener('change', () => {
       if (currentFileType === 'video') {
-        updatePresetLabels();
-        updateVideoEstimate();
+        onVideoSettingsChanged();
       }
     });
   }
@@ -275,46 +274,99 @@ export function initCompressor() {
   }
 
   // Download compressed file
-  compressDownloadBtn.addEventListener('click', () => {
-    if (!currentCompressedBlob || !currentCompressFile) return;
+  compressDownloadBtn.addEventListener('click', async () => {
+    if (!currentCompressFile) return;
 
-    const rawName = currentCompressFile.name;
-    const lastDot = rawName.lastIndexOf('.');
-    const baseName = lastDot !== -1 ? rawName.slice(0, lastDot) : rawName;
-    const origExt = lastDot !== -1 ? rawName.slice(lastDot + 1).toLowerCase() : '';
+    if (currentFileType === 'video') {
+      if (isCompressing) {
+        autoDownloadPending = true;
+        showToast('⏳ Compression en cours... Le téléchargement débutera dès la fin !');
+        return;
+      }
 
-    let outExt = origExt;
-    if (currentFileType === 'pdf') {
-      outExt = 'pdf';
-    } else if (currentFileType === 'video') {
-      outExt = currentCompressedBlob.type.includes('mp4') ? 'mp4' : 'webm';
-    } else if (origExt === 'png' && currentCompressedBlob.type === 'image/webp') {
-      outExt = 'webp';
-    } else if (origExt === 'jpg' || origExt === 'jpeg') {
-      outExt = 'jpg';
-    } else if (origExt === 'webp') {
-      outExt = 'webp';
-    } else {
-      outExt = currentCompressedBlob.type.split('/')[1] || 'jpg';
+      if (!currentCompressedBlob) {
+        autoDownloadPending = true;
+        showToast('⚡ Compression de la vidéo en cours avant téléchargement...');
+        await runVideoCompression();
+        return;
+      }
     }
 
-    const downloadName = `${baseName}_compressed.${outExt}`;
-    const url = URL.createObjectURL(currentCompressedBlob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = downloadName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    if (!currentCompressedBlob) {
+      showToast('Aucun fichier compressé disponible.');
+      return;
+    }
 
-    showToast(`Téléchargement de ${downloadName} réussi ! 🎉`);
+    triggerDownload();
   });
 
   // Reset to Step 1
   compressNewBtn.addEventListener('click', () => {
     resetCompressor();
   });
+}
+
+function onVideoSettingsChanged() {
+  if (currentFileType !== 'video') return;
+  currentCompressedBlob = null;
+  compressDownloadBtnText.textContent = 'Télécharger la vidéo';
+  updatePresetLabels();
+  updateVideoEstimate();
+}
+
+function triggerDownload() {
+  if (!currentCompressedBlob || !currentCompressFile) return;
+
+  const rawName = currentCompressFile.name;
+  const lastDot = rawName.lastIndexOf('.');
+  const baseName = lastDot !== -1 ? rawName.slice(0, lastDot) : rawName;
+  const origExt = lastDot !== -1 ? rawName.slice(lastDot + 1).toLowerCase() : '';
+
+  let outExt = origExt;
+  if (currentFileType === 'pdf') {
+    outExt = 'pdf';
+  } else if (currentFileType === 'video') {
+    if (currentCompressedBlob.type.includes('mp4')) {
+      outExt = 'mp4';
+    } else if (currentCompressedBlob.type.includes('webm')) {
+      outExt = 'webm';
+    } else {
+      outExt = origExt || 'mp4';
+    }
+  } else if (origExt === 'png' && currentCompressedBlob.type === 'image/webp') {
+    outExt = 'webp';
+  } else if (origExt === 'jpg' || origExt === 'jpeg') {
+    outExt = 'jpg';
+  } else if (origExt === 'webp') {
+    outExt = 'webp';
+  } else {
+    outExt = currentCompressedBlob.type.split('/')[1] || 'jpg';
+  }
+
+  const cleanBase = baseName.replace(/\.+$/, '');
+  const downloadName = `${cleanBase}_compressed.${outExt}`;
+
+  try {
+    const url = URL.createObjectURL(currentCompressedBlob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = downloadName;
+    document.body.appendChild(a);
+    a.click();
+
+    setTimeout(() => {
+      try {
+        if (a.parentNode) document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {}
+    }, 60000);
+
+    showToast(`Téléchargement de ${downloadName} lancé ! 🎉`);
+  } catch (err) {
+    console.error('Download error:', err);
+    showToast('Erreur lors du téléchargement : ' + err.message);
+  }
 }
 
 function setResolutionScale(scale) {
@@ -366,8 +418,8 @@ function handleCompressFile(file) {
     if (compressScaleLabel) compressScaleLabel.textContent = 'Résolution vidéo :';
     if (compressVideoOptions) compressVideoOptions.hidden = false;
     if (compressStartVideoBtn) compressStartVideoBtn.hidden = false;
-    compressDownloadBtn.disabled = true;
-    compressDownloadBtnText.textContent = 'Télécharger la vidéo compressée';
+    compressDownloadBtn.disabled = false;
+    compressDownloadBtnText.textContent = 'Télécharger la vidéo';
     loadVideoForCompression(file);
   } else if (isImage) {
     compressFileIcon.textContent = '🖼️';
@@ -413,6 +465,7 @@ function loadVideoForCompression(file) {
   compressCanvasPreview.hidden = true;
 
   compressVideoPreview.onloadedmetadata = () => {
+    compressVideoPreview.onloadedmetadata = null;
     // Handle WebM bug where duration can be Infinity
     if (!isFinite(compressVideoPreview.duration) || compressVideoPreview.duration <= 0) {
       compressVideoPreview.currentTime = 1e10;
@@ -745,6 +798,7 @@ async function compressVideoAsync() {
   compressStatusIndicator.classList.add('processing');
   compressStatusText.textContent = 'Optimisation vidéo en cours...';
   compressStartVideoBtn.disabled = true;
+  compressDownloadBtn.disabled = true;
 
   // Setup offscreen canvas & video
   const canvas = document.createElement('canvas');
@@ -831,6 +885,7 @@ async function compressVideoAsync() {
       try { recorder.stop(); } catch(e){}
       compressProgressContainer.hidden = true;
       compressStartVideoBtn.disabled = false;
+      compressDownloadBtn.disabled = false;
       compressStatusIndicator.classList.remove('processing');
       compressStatusText.textContent = 'Compression vidéo annulée';
       showToast('Compression vidéo annulée.');
@@ -855,6 +910,7 @@ async function compressVideoAsync() {
       const compressedBlob = new Blob(chunks, { type: chosenMime });
       compressProgressContainer.hidden = true;
       compressStartVideoBtn.disabled = false;
+      compressDownloadBtn.disabled = false;
       resolve({ blob: compressedBlob, ext: outExt });
     };
 
@@ -866,6 +922,7 @@ async function compressVideoAsync() {
       activeVideoProcessor = null;
       compressProgressContainer.hidden = true;
       compressStartVideoBtn.disabled = false;
+      compressDownloadBtn.disabled = false;
       reject(err);
     };
 
@@ -898,7 +955,13 @@ async function compressVideoAsync() {
     procVideo.currentTime = 0;
     procVideo.play().then(() => {
       renderLoop();
-    }).catch(reject);
+    }).catch(err => {
+      console.warn('Playback error with sound, falling back to muted play:', err);
+      procVideo.muted = true;
+      procVideo.play().then(() => {
+        renderLoop();
+      }).catch(reject);
+    });
   });
 }
 
@@ -932,10 +995,17 @@ async function runVideoCompression() {
         compressStartVideoText.textContent = '⚡ Recompresser la vidéo';
       }
 
-      // Update player to show compressed video
+      // Update player to show compressed video safely without triggering re-estimation
       const compUrl = URL.createObjectURL(result.blob);
+      compressVideoPreview.onloadedmetadata = null;
+      compressVideoPreview.ontimeupdate = null;
       compressVideoPreview.src = compUrl;
       showToast('Vidéo compressée avec succès ! 🎉');
+
+      if (autoDownloadPending) {
+        autoDownloadPending = false;
+        triggerDownload();
+      }
     }
   } catch (err) {
     console.error('Video compression error:', err);
@@ -944,6 +1014,8 @@ async function runVideoCompression() {
   } finally {
     isCompressing = false;
     compressStatusIndicator.classList.remove('processing');
+    if (compressStartVideoBtn) compressStartVideoBtn.disabled = false;
+    compressDownloadBtn.disabled = false;
   }
 }
 
@@ -1134,6 +1206,7 @@ function resetCompressor() {
   loadedPdfDoc = null;
   pdfOriginalBuffer = null;
   currentCompressedBlob = null;
+  autoDownloadPending = false;
   videoDuration = 0;
   videoWidth = 0;
   videoHeight = 0;
@@ -1144,6 +1217,8 @@ function resetCompressor() {
   compressImgPreview.src = '';
   compressImgPreview.hidden = true;
   compressCanvasPreview.hidden = true;
+  compressVideoPreview.onloadedmetadata = null;
+  compressVideoPreview.ontimeupdate = null;
   compressVideoPreview.src = '';
   compressVideoPreview.hidden = true;
   compressProgressContainer.hidden = true;
