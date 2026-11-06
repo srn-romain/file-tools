@@ -540,12 +540,67 @@ function createSignatureItem(pageIndex, overlay, x, y, dataUrl, includeMeta = tr
   itemEl.appendChild(bar);
   itemEl.appendChild(img);
 
-  // Optional Metadata text caption
+  // Optional Metadata text caption with size controls
   if (includeMeta && metaText) {
+    const captionWrap = document.createElement('div');
+    captionWrap.className = 'filler-sig-caption-wrap';
+
     const caption = document.createElement('div');
     caption.className = 'filler-sig-caption';
     caption.textContent = metaText;
-    itemEl.appendChild(caption);
+
+    const defaultCaptionSize = 9; // px
+    caption.style.fontSize = `${defaultCaptionSize}px`;
+    itemEl.dataset.captionFontSize = defaultCaptionSize;
+
+    // Caption size controls
+    const captionBar = document.createElement('div');
+    captionBar.className = 'filler-sig-caption-bar';
+
+    const captionBtnDec = document.createElement('button');
+    captionBtnDec.type = 'button';
+    captionBtnDec.className = 'filler-btn-micro';
+    captionBtnDec.textContent = 'A-';
+    captionBtnDec.title = 'Réduire le texte électronique';
+
+    const captionSizeTag = document.createElement('span');
+    captionSizeTag.className = 'filler-size-tag';
+    captionSizeTag.textContent = `${defaultCaptionSize}px`;
+
+    const captionBtnInc = document.createElement('button');
+    captionBtnInc.type = 'button';
+    captionBtnInc.className = 'filler-btn-micro';
+    captionBtnInc.textContent = 'A+';
+    captionBtnInc.title = 'Agrandir le texte électronique';
+
+    captionBtnDec.addEventListener('mousedown', (e) => e.preventDefault());
+    captionBtnInc.addEventListener('mousedown', (e) => e.preventDefault());
+
+    captionBtnDec.addEventListener('click', (e) => {
+      e.stopPropagation();
+      let cur = parseInt(itemEl.dataset.captionFontSize, 10) || defaultCaptionSize;
+      cur = Math.max(5, cur - 1);
+      itemEl.dataset.captionFontSize = cur;
+      caption.style.fontSize = `${cur}px`;
+      captionSizeTag.textContent = `${cur}px`;
+    });
+
+    captionBtnInc.addEventListener('click', (e) => {
+      e.stopPropagation();
+      let cur = parseInt(itemEl.dataset.captionFontSize, 10) || defaultCaptionSize;
+      cur = Math.min(20, cur + 1);
+      itemEl.dataset.captionFontSize = cur;
+      caption.style.fontSize = `${cur}px`;
+      captionSizeTag.textContent = `${cur}px`;
+    });
+
+    captionBar.appendChild(captionBtnDec);
+    captionBar.appendChild(captionSizeTag);
+    captionBar.appendChild(captionBtnInc);
+
+    captionWrap.appendChild(caption);
+    captionWrap.appendChild(captionBar);
+    itemEl.appendChild(captionWrap);
   }
 
   // Size Controls

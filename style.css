@@ -3737,19 +3737,42 @@ body {
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }
 
+.filler-sig-caption-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: 2px;
+}
+
 .filler-sig-caption {
-  font-size: 0.64rem;
+  font-size: 9px;
   font-family: var(--font-sans);
   font-weight: 600;
   color: #0f172a;
   background: rgba(255, 255, 255, 0.85);
   border-top: 1px dashed rgba(15, 23, 42, 0.2);
   padding: 2px 4px;
-  margin-top: 2px;
   border-radius: 2px;
   white-space: nowrap;
   pointer-events: none;
   text-align: center;
+  line-height: 1.3;
+}
+
+.filler-sig-caption-bar {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 2px 4px;
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 0 0 4px 4px;
+  user-select: none;
+}
+
+.filler-signature-item:hover .filler-sig-caption-bar,
+.filler-signature-item.active .filler-sig-caption-bar {
+  display: flex;
 }
 
 /* Mini toolbar on signature item */
