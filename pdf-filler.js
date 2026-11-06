@@ -270,6 +270,11 @@ async function renderPdfPages(pdfData) {
     const wrapper = document.createElement('div');
     wrapper.className = 'filler-page-card filler-page-wrapper';
     wrapper.dataset.pageIndex = pNum - 1;
+    // Set wrapper to the exact canvas pixel size; max-width:100% in CSS
+    // will shrink it responsively. aspect-ratio locks the exact proportions
+    // so the overlay always matches the canvas perfectly.
+    wrapper.style.width = `${Math.round(viewport.width)}px`;
+    wrapper.style.aspectRatio = `${viewport.width} / ${viewport.height}`;
 
     // Header label
     const pageHeader = document.createElement('div');
@@ -292,8 +297,8 @@ async function renderPdfPages(pdfData) {
     // Interactive Text & Signature Overlay
     const overlay = document.createElement('div');
     overlay.className = 'filler-page-overlay';
-    overlay.style.width = `${displayWidth}px`;
-    overlay.style.height = `${displayHeight}px`;
+    // Overlay sizes itself to 100% of the wrapper via CSS;
+    // no fixed width/height needed here.
 
     // Click on overlay to add text field
     overlay.addEventListener('click', (e) => {
@@ -1206,6 +1211,7 @@ function setupDownload() {
           // Convert to PDF coordinates (PDF-Lib (0,0) is bottom-left)
           const pdfX = (itemX + 5) * scaleX;
           const pdfY = pdfHeight - ((itemY + 2) * scaleY) - (pdfFontSize * 0.82);
+        console.log('TextItem coords:', {itemX, itemY, pdfX, pdfY, pdfFontSize});
 
           // Handle multi-line
           const lines = rawText.split('\n');
@@ -1242,7 +1248,8 @@ function setupDownload() {
             const pdfSigX = itemX * scaleX;
             const pdfSigWidth = itemWidth * scaleX;
             const pdfSigHeight = itemHeight * scaleY;
-            const pdfSigY = pdfHeight - (itemY * scaleY) - pdfSigHeight;
+            const pdfSigY = pdfHeight - ((itemY + itemHeight) * scaleY);
+        console.log('SignatureItem coords:', {itemX, itemY, itemWidth, itemHeight, pdfSigX, pdfSigY, pdfSigWidth, pdfSigHeight});
 
             // Draw signature image
             page.drawImage(pngImage, {
