@@ -607,7 +607,7 @@ function createSignatureItem(pageIndex, overlay, x, y, dataUrl, includeMeta = tr
   btnDec.addEventListener('click', (e) => {
     e.stopPropagation();
     let cur = parseInt(itemEl.style.width, 10) || 170;
-    cur = Math.max(70, cur - 20);
+    cur = Math.max(50, cur - 20);
     itemEl.style.width = `${cur}px`;
     sizeTag.textContent = `${cur}px`;
   });
@@ -615,7 +615,7 @@ function createSignatureItem(pageIndex, overlay, x, y, dataUrl, includeMeta = tr
   btnInc.addEventListener('click', (e) => {
     e.stopPropagation();
     let cur = parseInt(itemEl.style.width, 10) || 170;
-    cur = Math.min(420, cur + 20);
+    cur = Math.min(600, cur + 20);
     itemEl.style.width = `${cur}px`;
     sizeTag.textContent = `${cur}px`;
   });
@@ -625,6 +625,14 @@ function createSignatureItem(pageIndex, overlay, x, y, dataUrl, includeMeta = tr
     itemEl.remove();
     if (activeItemEl === itemEl) activeItemEl = null;
   });
+
+  // Corner Resize Handle (smooth drag-to-resize)
+  const resizeHandle = document.createElement('div');
+  resizeHandle.className = 'filler-resize-handle';
+  resizeHandle.title = 'Glisser pour agrandir ou réduire la signature';
+  itemEl.appendChild(resizeHandle);
+
+  setupSignatureResizing(itemEl, resizeHandle, sizeTag, overlay);
 
   // Activate on click
   itemEl.addEventListener('click', (e) => {
@@ -644,6 +652,67 @@ function createSignatureItem(pageIndex, overlay, x, y, dataUrl, includeMeta = tr
 }
 
 /**
+ * Handle smooth mouse / touch / pen corner resizing for signature items
+ */
+function setupSignatureResizing(itemEl, handleEl, sizeTagEl, overlay) {
+  let isResizing = false;
+  let startX = 0;
+  let startWidth = 0;
+
+  handleEl.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 && e.button !== undefined) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    isResizing = true;
+    startX = e.clientX;
+    startWidth = itemEl.offsetWidth || 170;
+
+    itemEl.classList.add('is-resizing');
+    document.querySelectorAll('.filler-text-item.active, .filler-signature-item.active').forEach(el => el.classList.remove('active'));
+    itemEl.classList.add('active');
+    activeItemEl = itemEl;
+
+    try {
+      handleEl.setPointerCapture(e.pointerId);
+    } catch (_) {}
+
+    const onPointerMove = (moveEvent) => {
+      if (!isResizing) return;
+      moveEvent.preventDefault();
+
+      const dx = moveEvent.clientX - startX;
+      const leftPos = parseInt(itemEl.style.left, 10) || 0;
+      const maxAllowedWidth = Math.max(80, overlay.clientWidth - leftPos - 8);
+      const newWidth = Math.round(Math.max(50, Math.min(Math.min(600, maxAllowedWidth), startWidth + dx)));
+
+      itemEl.style.width = `${newWidth}px`;
+      if (sizeTagEl) sizeTagEl.textContent = `${newWidth}px`;
+    };
+
+    const onPointerUp = (upEvent) => {
+      if (!isResizing) return;
+      isResizing = false;
+      itemEl.classList.remove('is-resizing');
+
+      try {
+        if (handleEl.hasPointerCapture(upEvent.pointerId)) {
+          handleEl.releasePointerCapture(upEvent.pointerId);
+        }
+      } catch (_) {}
+
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+  });
+}
+
+/**
  * Handle mouse / touch / pen dragging for signature items
  * Allows dragging from ANYWHERE on the signature card (image, caption, handle, bar)
  */
@@ -657,8 +726,8 @@ function setupSignatureDragging(itemEl, overlay) {
   itemEl.addEventListener('pointerdown', (e) => {
     // Left-click only (or touch/pen)
     if (e.button !== 0 && e.button !== undefined) return;
-    // Don't drag if clicking mini toolbar buttons (+, -, delete)
-    if (e.target.closest('.filler-btn-micro')) return;
+    // Don't drag if clicking mini toolbar buttons (+, -, delete) or resize corner handle
+    if (e.target.closest('.filler-btn-micro') || e.target.closest('.filler-resize-handle')) return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -1319,7 +1388,8 @@ function setupDownload() {
             const captionEl = sigItem.querySelector('.filler-sig-caption');
             if (captionEl && captionEl.textContent) {
               const metaText = captionEl.textContent.trim();
-              const metaFontSize = Math.max(5.5, Math.min(9, 7.5 * scaleX));
+              const captionFontSizePx = parseInt(sigItem.dataset.captionFontSize, 10) || 9;
+              const metaFontSize = Math.max(4, captionFontSizePx * scaleX);
               page.drawText(metaText, {
                 x: pdfSigX,
                 y: Math.max(4, pdfSigY - (metaFontSize * 1.35)),
