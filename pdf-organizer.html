@@ -142,6 +142,7 @@
           <div class="pdf-toolbar-stats">
             <span id="pdf-pages-count" class="stat-badge">0 page au total</span>
             <span id="pdf-selected-count" class="stat-badge stat-badge-accent">0 sélectionnée</span>
+            <span id="pdf-multi-selected-badge" class="stat-badge stat-badge-multi" hidden>0 sélectionnée(s) pour déplacer</span>
           </div>
 
           <div class="pdf-toolbar-actions">
@@ -166,6 +167,27 @@
               <span>Ajouter d'autres PDF</span>
             </button>
             <input type="file" id="pdf-add-more-input" accept="application/pdf" multiple hidden>
+          </div>
+        </div>
+
+        <!-- PDF Order Section (Collapsible) -->
+        <div id="pdf-order-section" class="pdf-order-section" hidden>
+          <button type="button" id="pdf-order-toggle-btn" class="pdf-order-header" aria-expanded="true">
+            <div class="pdf-order-header-left">
+              <span class="pdf-order-icon">📑</span>
+              <span class="pdf-order-title">Ordre des fichiers PDF</span>
+              <span id="pdf-order-count" class="stat-badge">0 fichier</span>
+            </div>
+            <div class="pdf-order-header-right">
+              <span class="pdf-order-toggle-hint">Afficher / Masquer</span>
+              <span id="pdf-order-chevron" class="pdf-order-chevron">▾</span>
+            </div>
+          </button>
+          <div id="pdf-order-body" class="pdf-order-body">
+            <p class="pdf-order-hint">Glissez-déposez ou utilisez les flèches pour changer l'ordre des documents PDF.</p>
+            <div id="pdf-order-list" class="pdf-order-list" aria-label="Liste de l'ordre des fichiers PDF">
+              <!-- Dynamic PDF document order items rendered here -->
+            </div>
           </div>
         </div>
 
@@ -219,6 +241,33 @@
 
   <!-- Notification Toast -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Confirmation Modal for Reordering Mixed Pages -->
+  <div id="pdf-reorder-confirm-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pdf-reorder-modal-title" hidden>
+    <div class="modal-card pdf-confirm-modal-card">
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <span class="modal-icon">⚠️</span>
+          <div>
+            <h2 id="pdf-reorder-modal-title" class="modal-title">Attention : pages mélangées</h2>
+            <p class="modal-subtitle">Confirmation requise avant de réinitialiser l'ordre</p>
+          </div>
+        </div>
+        <button type="button" id="pdf-reorder-close-btn" class="modal-close-btn" aria-label="Fermer">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="pdf-confirm-text">
+          Attention, vos pages sont actuellement mélangées ou réorganisées manuellement.
+          En changeant l'ordre des fichiers PDF, vous allez <strong>réinitialiser l'ordre des pages</strong> pour les regrouper par document.
+        </p>
+        <p class="pdf-confirm-question">Est-ce OK pour vous ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="pdf-reorder-cancel-btn" class="btn btn-secondary">Annuler</button>
+        <button type="button" id="pdf-reorder-confirm-btn" class="btn btn-warning-confirm">Oui, réinitialiser l'ordre</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Dedicated PDF Organizer Script -->
   <script type="module" src="pdf-organizer.js"></script>
