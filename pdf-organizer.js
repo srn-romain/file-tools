@@ -28,6 +28,12 @@ const pdfSelectAllBtn = document.getElementById('pdf-select-all-btn');
 const pdfDeselectAllBtn = document.getElementById('pdf-deselect-all-btn');
 const pdfAddMoreBtn = document.getElementById('pdf-add-more-btn');
 const pdfAddMoreInput = document.getElementById('pdf-add-more-input');
+const pdfBulkActions = document.getElementById('pdf-bulk-actions');
+const pdfBulkCount = document.getElementById('pdf-bulk-count');
+const pdfBulkRotateLeftBtn = document.getElementById('pdf-bulk-rotate-left-btn');
+const pdfBulkRotateRightBtn = document.getElementById('pdf-bulk-rotate-right-btn');
+const pdfBulkDeleteBtn = document.getElementById('pdf-bulk-delete-btn');
+const pdfBulkClearBtn = document.getElementById('pdf-bulk-clear-btn');
 const pdfLoadingIndicator = document.getElementById('pdf-loading-indicator');
 const pdfLoadingText = document.getElementById('pdf-loading-text');
 
@@ -522,11 +528,69 @@ function updateMultiSelectionUI() {
     cardEl.classList.toggle('multi-selected', multiSelectedPageIds.has(cardEl.dataset.id));
   });
 
+  const count = multiSelectedPageIds.size;
+
   if (pdfMultiSelectedBadge) {
-    const count = multiSelectedPageIds.size;
     pdfMultiSelectedBadge.hidden = count === 0;
-    pdfMultiSelectedBadge.textContent = `${count} sélectionnée${count > 1 ? 's' : ''} pour déplacer`;
+    pdfMultiSelectedBadge.textContent = `${count} sélectionnée${count > 1 ? 's' : ''}`;
   }
+
+  if (pdfBulkActions) {
+    pdfBulkActions.hidden = count === 0;
+  }
+
+  if (pdfBulkCount) {
+    pdfBulkCount.textContent = `${count} page${count > 1 ? 's' : ''} sélectionnée${count > 1 ? 's' : ''}`;
+  }
+}
+
+/**
+ * Rotate all multi-selected pages by deltaDegrees (-90 or +90)
+ */
+function rotateSelectedPages(deltaDegrees) {
+  if (multiSelectedPageIds.size === 0) return;
+
+  let rotatedCount = 0;
+  pdfPages.forEach(page => {
+    if (!multiSelectedPageIds.has(page.id)) return;
+    page.rotation = ((page.rotation + deltaDegrees) % 360 + 360) % 360;
+    rotatedCount++;
+
+    const cardEl = pdfPagesGrid.querySelector(`.pdf-page-card[data-id="${page.id}"]`);
+    const canvas = cardEl?.querySelector('.page-thumbnail-canvas');
+    if (canvas) {
+      canvas.style.transform = `rotate(${page.rotation}deg)`;
+    }
+  });
+
+  if (rotatedCount > 0) {
+    const dirLabel = deltaDegrees > 0 ? '+90° (droite)' : '-90° (gauche)';
+    showToast(`${rotatedCount} page${rotatedCount > 1 ? 's' : ''} pivotée${rotatedCount > 1 ? 's' : ''} de ${dirLabel}.`);
+  }
+}
+
+/**
+ * Permanently remove all multi-selected pages from the current workspace
+ */
+function deleteSelectedPages() {
+  if (multiSelectedPageIds.size === 0) return;
+
+  const beforeCount = pdfPages.length;
+  pdfPages = pdfPages.filter(p => !multiSelectedPageIds.has(p.id));
+  const deletedCount = beforeCount - pdfPages.length;
+
+  if (deletedCount === 0) return;
+
+  const remainingDocIds = new Set(pdfPages.map(p => p.docId));
+  pdfDocuments = pdfDocuments.filter(doc => remainingDocIds.has(doc.id));
+
+  multiSelectedPageIds.clear();
+  lastClickedPageIndex = null;
+
+  renderPdfOrderList();
+  renderPdfGrid();
+  updatePdfStats();
+  showToast(`${deletedCount} page${deletedCount > 1 ? 's' : ''} supprimée${deletedCount > 1 ? 's' : ''}.`);
 }
 
 /**
@@ -672,6 +736,26 @@ function setupPdfBatchActions() {
       goToPdfStep(1);
     }
   });
+
+  if (pdfBulkRotateLeftBtn) {
+    pdfBulkRotateLeftBtn.addEventListener('click', () => rotateSelectedPages(-90));
+  }
+
+  if (pdfBulkRotateRightBtn) {
+    pdfBulkRotateRightBtn.addEventListener('click', () => rotateSelectedPages(90));
+  }
+
+  if (pdfBulkDeleteBtn) {
+    pdfBulkDeleteBtn.addEventListener('click', () => deleteSelectedPages());
+  }
+
+  if (pdfBulkClearBtn) {
+    pdfBulkClearBtn.addEventListener('click', () => {
+      multiSelectedPageIds.clear();
+      lastClickedPageIndex = null;
+      updateMultiSelectionUI();
+    });
+  }
 }
 
 /**
@@ -716,6 +800,12 @@ function setupPdfOrderControls() {
         lastClickedPageIndex = null;
         updateMultiSelectionUI();
       }
+    } else if ((e.key === 'Delete' || e.key === 'Backspace') && multiSelectedPageIds.size > 0) {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (pdfReorderConfirmModal && !pdfReorderConfirmModal.hidden) return;
+      e.preventDefault();
+      deleteSelectedPages();
     }
   });
 }

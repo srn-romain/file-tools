@@ -170,6 +170,28 @@
           </div>
         </div>
 
+        <!-- Bulk Selection Actions Bar -->
+        <div id="pdf-bulk-actions" class="pdf-bulk-actions" hidden>
+          <div class="pdf-bulk-actions-info">
+            <span id="pdf-bulk-count" class="pdf-bulk-count">0 page sélectionnée</span>
+            <span class="pdf-bulk-hint">Actions sur la sélection :</span>
+          </div>
+          <div class="pdf-bulk-actions-buttons">
+            <button type="button" id="pdf-bulk-rotate-left-btn" class="btn btn-secondary btn-sm" title="Pivoter les pages sélectionnées de 90° vers la gauche">
+              <span>↺ Pivoter gauche (-90°)</span>
+            </button>
+            <button type="button" id="pdf-bulk-rotate-right-btn" class="btn btn-secondary btn-sm" title="Pivoter les pages sélectionnées de 90° vers la droite">
+              <span>↻ Pivoter droite (+90°)</span>
+            </button>
+            <button type="button" id="pdf-bulk-delete-btn" class="btn btn-danger btn-sm" title="Supprimer les pages sélectionnées">
+              <span>🗑️ Supprimer la sélection</span>
+            </button>
+            <button type="button" id="pdf-bulk-clear-btn" class="btn btn-secondary btn-sm" title="Désélectionner (Échap)">
+              <span>✕ Désélectionner</span>
+            </button>
+          </div>
+        </div>
+
         <!-- PDF Order Section (Collapsible) -->
         <div id="pdf-order-section" class="pdf-order-section" hidden>
           <button type="button" id="pdf-order-toggle-btn" class="pdf-order-header" aria-expanded="true">
